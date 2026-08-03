@@ -15,28 +15,26 @@ interface Props {
 export default function Faq({ t }: Props) {
   return (
     <section id="faq" className="section-anchor py-20 md:py-28">
-      <div className="container px-4 md:px-6">
-        <div className="mx-auto max-w-3xl">
-          <h2 className="text-center text-3xl font-bold tracking-tight md:text-4xl">
+      <div className="container max-w-3xl px-4 md:px-6">
+        <div className="text-center">
+          <p className="mono-label">03 · support</p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
             {t.faq.title}
           </h2>
-          <Accordion type="single" collapsible className="mt-12 space-y-3">
-            {t.faq.items.map((item, i) => (
-              <AccordionItem
-                key={item.q}
-                value={`item-${i}`}
-                className="glass-card rounded-xl border px-5"
-              >
-                <AccordionTrigger className="py-4 text-left text-base font-medium hover:no-underline">
-                  {item.q}
-                </AccordionTrigger>
-                <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
-                  {item.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
         </div>
+        <Accordion type="single" collapsible className="mt-12 space-y-3">
+          {t.faq.items.map((item, i) => (
+            <AccordionItem key={item.q} value={`item-${i}`} className="glass-card rounded-xl border-0 px-5">
+              <AccordionTrigger className="gap-3 py-4 text-left text-sm font-medium text-zinc-200 hover:no-underline [&[data-state=open]>svg]:rotate-180 [&>svg]:text-zinc-500">
+                <span className="font-mono text-[10px] text-zinc-600">/{String(i + 1).padStart(2, '0')}</span>
+                {item.q}
+              </AccordionTrigger>
+              <AccordionContent className="pb-5 pl-9 text-[13px] leading-relaxed text-zinc-500">
+                {item.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
     </section>
   );

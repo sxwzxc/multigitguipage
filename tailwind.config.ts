@@ -81,6 +81,10 @@ const config: Config = {
         },
       },
       keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
         'accordion-down': {
           from: {
             height: '0',
