@@ -4,32 +4,32 @@
 
 @layer base {
   :root {
-    --background: 216 22% 5%;
-    --foreground: 210 20% 96%;
-    --card: 216 22% 7%;
-    --card-foreground: 210 20% 96%;
-    --popover: 216 22% 7%;
-    --popover-foreground: 210 20% 96%;
-    --primary: 190 85% 53%;
-    --primary-foreground: 216 22% 5%;
-    --secondary: 214 16% 12%;
-    --secondary-foreground: 210 20% 96%;
-    --muted: 214 16% 12%;
-    --muted-foreground: 213 12% 66%;
-    --accent: 190 85% 53%;
-    --accent-foreground: 216 22% 5%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 20% 96%;
-    --border: 214 12% 20%;
-    --input: 214 12% 20%;
-    --ring: 190 85% 53%;
-    --chart-1: 190 85% 53%;
-    --chart-2: 160 84% 39%;
-    --chart-3: 40 96% 55%;
-    --chart-4: 270 72% 60%;
-    --chart-5: 330 78% 56%;
+    --background: 217 50% 97%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 190 90% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 214 40% 93%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 214 40% 93%;
+    --muted-foreground: 215 25% 45%;
+    --accent: 190 90% 36%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 90%;
+    --input: 214 32% 90%;
+    --ring: 190 90% 36%;
+    --chart-1: 190 90% 36%;
+    --chart-2: 258 90% 62%;
+    --chart-3: 330 81% 60%;
+    --chart-4: 40 96% 55%;
+    --chart-5: 160 84% 39%;
     --radius: 0.625rem;
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   * {
@@ -42,17 +42,107 @@
     @apply bg-background text-foreground font-sans antialiased;
   }
   ::selection {
-    background: hsl(var(--primary) / 0.35);
+    background: hsl(var(--primary) / 0.25);
+  }
+}
+
+/* ---- 缓慢流动的极光背景 ---- */
+@keyframes aurora-drift-a {
+  0% {
+    transform: translate3d(-8%, -4%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(10%, 8%, 0) scale(1.18);
+  }
+  100% {
+    transform: translate3d(-4%, 12%, 0) scale(0.95);
+  }
+}
+@keyframes aurora-drift-b {
+  0% {
+    transform: translate3d(6%, 10%, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(-10%, -6%, 0) scale(0.92);
+  }
+  100% {
+    transform: translate3d(8%, -10%, 0) scale(1.2);
+  }
+}
+@keyframes aurora-drift-c {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-6%, 6%, 0) scale(1.15);
+  }
+  100% {
+    transform: translate3d(8%, -4%, 0) scale(0.9);
+  }
+}
+@keyframes aurora-pan {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.aurora-blob {
+  @apply absolute rounded-full opacity-60 blur-[110px];
+  will-change: transform;
+}
+.aurora-blob-a {
+  background: radial-gradient(circle at 30% 40%, #22d3ee 0%, transparent 65%);
+  animation: aurora-drift-a 22s ease-in-out infinite;
+}
+.aurora-blob-b {
+  background: radial-gradient(circle at 60% 55%, #818cf8 0%, transparent 65%);
+  animation: aurora-drift-b 26s ease-in-out infinite;
+}
+.aurora-blob-c {
+  background: radial-gradient(circle at 75% 25%, #f472b6 0%, transparent 65%);
+  animation: aurora-drift-c 30s ease-in-out infinite;
+}
+.aurora-sheen {
+  background: linear-gradient(
+    120deg,
+    rgba(34, 211, 238, 0.16),
+    rgba(129, 140, 248, 0.16) 35%,
+    rgba(244, 114, 182, 0.14) 65%,
+    rgba(34, 211, 238, 0.16)
+  );
+  background-size: 220% 220%;
+  animation: aurora-pan 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob,
+  .aurora-blob-a,
+  .aurora-blob-b,
+  .aurora-blob-c,
+  .aurora-sheen {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
 
 @layer components {
-  /* 渐变 1px 边缘 + 深色半透明填充 + 强模糊的玻璃壳 */
+  /* 浅色玻璃：半透明白 + 强模糊 + 渐变边缘 + 柔和阴影 */
   .glass-shell {
-    @apply relative bg-[#0b1018]/60 backdrop-blur-2xl;
+    @apply relative bg-white/60 backdrop-blur-2xl;
     box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-      0 24px 60px -24px rgba(0, 0, 0, 0.7);
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+      0 24px 60px -28px rgba(15, 23, 42, 0.22);
   }
   .glass-shell::before {
     content: '';
@@ -62,10 +152,9 @@
     padding: 1px;
     background: linear-gradient(
       155deg,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0.05) 30%,
-      rgba(255, 255, 255, 0.02) 60%,
-      rgba(34, 211, 238, 0.14) 100%
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.6) 35%,
+      rgba(8, 145, 178, 0.22) 100%
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
@@ -73,34 +162,11 @@
     mask-composite: exclude;
     pointer-events: none;
   }
-  .glass-shell::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 8%;
-    right: 8%;
-    height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgba(255, 255, 255, 0.28) 30%,
-      rgba(255, 255, 255, 0.28) 70%,
-      transparent
-    );
-    pointer-events: none;
-  }
-  .glass-shell-hover {
-    @apply transition-colors duration-300;
-  }
-  .glass-shell-hover:hover {
-    border-color: transparent;
-    background: #0e141f/70;
-  }
   .glass-card {
-    @apply relative rounded-2xl bg-[#0b1018]/70 backdrop-blur-2xl;
+    @apply relative rounded-2xl bg-white/70 backdrop-blur-2xl;
     box-shadow:
-      inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-      0 24px 60px -24px rgba(0, 0, 0, 0.7);
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+      0 24px 60px -28px rgba(15, 23, 42, 0.18);
   }
   .glass-card::before {
     content: '';
@@ -110,10 +176,9 @@
     padding: 1px;
     background: linear-gradient(
       155deg,
-      rgba(255, 255, 255, 0.16) 0%,
-      rgba(255, 255, 255, 0.05) 30%,
-      rgba(255, 255, 255, 0.02) 60%,
-      rgba(34, 211, 238, 0.12) 100%
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.6) 35%,
+      rgba(8, 145, 178, 0.2) 100%
     );
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
@@ -121,24 +186,8 @@
     mask-composite: exclude;
     pointer-events: none;
   }
-  .glass-card::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 10%;
-    right: 10%;
-    height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgba(255, 255, 255, 0.25) 35%,
-      rgba(255, 255, 255, 0.25) 65%,
-      transparent
-    );
-    pointer-events: none;
-  }
   .mono-label {
-    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground;
+    @apply font-mono text-[11px] uppercase tracking-[0.18em] text-slate-500;
   }
   .section-anchor {
     scroll-margin-top: 6rem;

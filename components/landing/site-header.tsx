@@ -34,11 +34,11 @@ export default function SiteHeader({ t, lang }: Props) {
       <div
         className={cn(
           'glass-shell mx-auto flex h-14 max-w-6xl items-center justify-between rounded-full px-3 pl-4 transition-all duration-300 sm:px-4',
-          isScrolled && 'shadow-[0_16px_48px_-16px_rgba(0,0,0,0.8)]'
+          isScrolled && 'shadow-[0_20px_50px_-20px_rgba(15,23,42,0.3)]'
         )}
       >
         <Link href="/" className="flex items-center gap-2.5" aria-label="MultiGitGui">
-          <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white/5">
+          <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white/70 shadow-sm">
             <Image
               src="/logo.png"
               alt="MultiGitGui logo"
@@ -48,8 +48,8 @@ export default function SiteHeader({ t, lang }: Props) {
               priority
             />
           </span>
-          <span className="font-mono text-sm font-semibold tracking-tight">
-            MultiGit<span className="text-cyan-300">Gui</span>
+          <span className="font-mono text-sm font-semibold tracking-tight text-slate-900">
+            MultiGit<span className="text-primary">Gui</span>
           </span>
         </Link>
 
@@ -58,7 +58,7 @@ export default function SiteHeader({ t, lang }: Props) {
             <a
               key={item.href}
               href={item.href}
-              className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground"
+              className="font-mono text-xs uppercase tracking-[0.16em] text-slate-500 transition-colors hover:text-slate-900"
             >
               {item.name}
             </a>
@@ -68,7 +68,7 @@ export default function SiteHeader({ t, lang }: Props) {
         <div className="flex items-center gap-2">
           <Link
             href={lang === 'zh' ? '/en' : '/'}
-            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-white/25 hover:text-foreground"
+            className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white/70 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.12em] text-slate-600 transition-colors hover:border-slate-300 hover:text-slate-900"
             aria-label={lang === 'zh' ? 'Switch to English' : '切换到中文'}
           >
             <Globe className="h-3.5 w-3.5" />
@@ -76,14 +76,14 @@ export default function SiteHeader({ t, lang }: Props) {
           </Link>
           <a
             href="#download"
-            className="hidden items-center gap-1.5 rounded-full border border-cyan-400/40 bg-cyan-400/10 px-4 py-1.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-cyan-300 transition-all hover:bg-cyan-400/20 md:flex"
+            className="hidden items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-lg shadow-cyan-600/25 transition-all hover:bg-cyan-700 md:flex"
           >
             <Download className="h-3.5 w-3.5" />
             {t.hero.ctaDownload}
           </a>
           <button
             type="button"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-foreground md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/70 text-slate-700 md:hidden"
             aria-label="Toggle menu"
             onClick={() => setMobileOpen((v) => !v)}
           >
@@ -99,7 +99,7 @@ export default function SiteHeader({ t, lang }: Props) {
               <a
                 key={item.href}
                 href={item.href}
-                className="rounded-xl px-4 py-2.5 font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
+                className="rounded-xl px-4 py-2.5 font-mono text-xs uppercase tracking-[0.16em] text-slate-500 transition-colors hover:bg-white/70 hover:text-slate-900"
                 onClick={() => setMobileOpen(false)}
               >
                 {item.name}
@@ -107,7 +107,7 @@ export default function SiteHeader({ t, lang }: Props) {
             ))}
             <a
               href="#download"
-              className="mt-1 flex items-center justify-center gap-1.5 rounded-full bg-cyan-400/15 px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-cyan-300"
+              className="mt-1 flex items-center justify-center gap-1.5 rounded-full bg-primary px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-white"
               onClick={() => setMobileOpen(false)}
             >
               <Download className="h-3.5 w-3.5" />

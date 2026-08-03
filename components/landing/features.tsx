@@ -36,10 +36,10 @@ export default function Features({ t }: Props) {
       <div className="container max-w-6xl px-4 md:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <p className="mono-label">01 · capabilities</p>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
             {t.features.title}
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-zinc-400 md:text-lg">
+          <p className="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
             {t.features.subtitle}
           </p>
         </div>
@@ -50,16 +50,16 @@ export default function Features({ t }: Props) {
             return (
               <div
                 key={item.title}
-                className="glass-card group p-6 transition-all duration-300 hover:bg-[#0d1520]/80"
+                className="glass-card group p-6 transition-all duration-300 hover:bg-white/80"
               >
                 <div className="flex items-start justify-between">
-                  <Icon className="h-5 w-5 text-zinc-400 transition-colors duration-300 group-hover:text-cyan-300" />
-                  <span className="mono-label text-[9px] text-zinc-600 group-hover:text-zinc-500">
+                  <Icon className="h-5 w-5 text-slate-500 transition-colors duration-300 group-hover:text-primary" />
+                  <span className="mono-label text-[9px] text-slate-300 group-hover:text-slate-400">
                     /{String(i + 1).padStart(2, '0')}
                   </span>
                 </div>
-                <h3 className="mt-5 text-base font-medium text-zinc-100">{item.title}</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">{item.desc}</p>
+                <h3 className="mt-5 text-base font-medium text-slate-900">{item.title}</h3>
+                <p className="mt-2 text-[13px] leading-relaxed text-slate-500">{item.desc}</p>
               </div>
             );
           })}

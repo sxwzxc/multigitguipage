@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     icon: '/favicon.ico',
     apple: '/logo.png',
   },
-  themeColor: '#0a0e14',
+  themeColor: '#f4f7fc',
   openGraph: {
     title: 'MultiGitGui',
     description: zh.meta.description,
