@@ -36,6 +36,9 @@ export interface Translation {
     version: string;
     comingSoon: string;
     downloadNow: string;
+    assembling: string;
+    failed: string;
+    shaLabel: string;
     gitReq: string;
     windows: { name: string; file: string; desc: string };
     macos: { name: string; file: string; desc: string };
@@ -142,6 +145,9 @@ export const zh: Translation = {
     version: '当前版本',
     comingSoon: '即将推出',
     downloadNow: '立即下载',
+    assembling: '正在下载并合并安装包',
+    failed: '下载失败，请重试',
+    shaLabel: 'SHA-256 校验和',
     gitReq: '需要 Git 2.30 或更新版本（MultiGitGui 不内置 Git，驱动你选定的 Git，因此 credential helper、hooks 与 SSH 配置继续生效）。',
     windows: {
       name: 'Windows',

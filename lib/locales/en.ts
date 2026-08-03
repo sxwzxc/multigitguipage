@@ -84,6 +84,9 @@ export const en: Translation = {
     version: 'Current version',
     comingSoon: 'Coming soon',
     downloadNow: 'Download now',
+    assembling: 'Downloading & assembling installer',
+    failed: 'Download failed, please retry',
+    shaLabel: 'SHA-256 checksum',
     gitReq: 'Requires Git 2.30 or newer. MultiGitGui does not bundle Git — it drives the Git you choose, so your credential helpers, hooks and SSH setup keep working.',
     windows: {
       name: 'Windows',

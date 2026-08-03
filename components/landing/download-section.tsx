@@ -1,6 +1,8 @@
 'use client';
 
-import { Monitor, Laptop, Terminal, Download } from 'lucide-react';
+import { Monitor, Laptop, Terminal } from 'lucide-react';
+import DownloadButton from '@/components/landing/download-button';
+import { windowsInstaller } from '@/lib/installer';
 import type { Translation } from '@/lib/locales/zh';
 
 interface Props {
@@ -62,14 +64,7 @@ export default function DownloadSection({ t }: Props) {
                   {t.download[key].desc}
                 </p>
                 {isWindows ? (
-                  <a
-                    href="/downloads/MultiGitGui-Setup-1.1.5.exe"
-                    download
-                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-white shadow-lg shadow-cyan-600/25 transition-all hover:bg-cyan-700"
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    {t.download.downloadNow}
-                  </a>
+                  <DownloadButton t={t} />
                 ) : (
                   <button
                     type="button"
@@ -98,6 +93,10 @@ export default function DownloadSection({ t }: Props) {
               <span className="ml-2 text-slate-500">git version 2.30+ required</span>
             </p>
             <p className="text-slate-500">{t.download.gitReq}</p>
+            <p className="pt-1">
+              <span className="text-slate-500">{t.download.shaLabel}</span>
+              <span className="ml-2 break-all text-slate-400">{windowsInstaller.sha256}</span>
+            </p>
           </div>
         </div>
       </div>
