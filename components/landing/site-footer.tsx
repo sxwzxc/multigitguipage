@@ -28,16 +28,12 @@ export default function SiteFooter({ t }: Props) {
         { name: t.footer.linux, href: '#download', icon: Terminal },
       ],
     },
-    {
-      title: t.footer.legal,
-      links: [{ name: t.footer.license, href: '#' }],
-    },
   ];
 
   return (
     <footer className="relative border-t border-white/60 bg-white/30 py-14 backdrop-blur-xl">
       <div className="container max-w-6xl px-4 md:px-6">
-        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-2.5">
               <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white/70 shadow-sm">

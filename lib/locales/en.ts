@@ -14,7 +14,7 @@ export const en: Translation = {
     switchLang: '中',
   },
   hero: {
-    badge: 'v1.1.5 · Cross-platform · Free & open source',
+    badge: 'v1.1.5 · Cross-platform · Free',
     title1: 'One project, ',
     title2: 'every repository',
     subtitle:
@@ -125,7 +125,7 @@ export const en: Translation = {
       },
       {
         q: 'Is it free?',
-        a: 'Completely free and open source under the MIT license. Use, modify and redistribute it freely.',
+        a: 'Yes, it is completely free to use — no paid tiers, no subscriptions.',
       },
       {
         q: 'Does it have a Chinese interface?',
@@ -145,14 +145,12 @@ export const en: Translation = {
     tagline: 'A multi-repository Git desktop client for cross-repo workflows.',
     product: 'Product',
     platforms: 'Platforms',
-    legal: 'Legal',
     featuresLink: 'Features',
     downloadLink: 'Download',
     faqLink: 'FAQ',
     win: 'Windows 10 1809+',
     mac: 'macOS 12+',
     linux: 'Linux x64 / arm64',
-    license: 'MIT License',
     copyright: '© {year} sxw. All rights reserved.',
   },
 };

@@ -56,14 +56,12 @@ export interface Translation {
     tagline: string;
     product: string;
     platforms: string;
-    legal: string;
     featuresLink: string;
     downloadLink: string;
     faqLink: string;
     win: string;
     mac: string;
     linux: string;
-    license: string;
     copyright: string;
   };
 }
@@ -82,7 +80,7 @@ export const zh: Translation = {
     switchLang: 'EN',
   },
   hero: {
-    badge: 'v1.1.5 · 跨平台 · 免费开源',
+    badge: 'v1.1.5 · 跨平台 · 免费',
     title1: '一个项目，',
     title2: '同时管理所有仓库',
     subtitle:
@@ -193,7 +191,7 @@ export const zh: Translation = {
       },
       {
         q: '免费吗？',
-        a: '完全免费，使用 MIT 协议开源。可以自由使用、修改与分发。',
+        a: '完全免费，无需付费即可使用全部功能。',
       },
       {
         q: '支持中文界面吗？',
@@ -213,14 +211,12 @@ export const zh: Translation = {
     tagline: '面向跨仓库工作流的多仓库 Git 桌面客户端。',
     product: '产品',
     platforms: '平台',
-    legal: '法律',
     featuresLink: '特性',
     downloadLink: '下载',
     faqLink: '常见问题',
     win: 'Windows 10 1809+',
     mac: 'macOS 12+',
     linux: 'Linux x64 / arm64',
-    license: 'MIT 协议',
     copyright: '© {year} sxw. 保留所有权利。',
   },
 };
