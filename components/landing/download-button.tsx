@@ -42,7 +42,7 @@ export default function DownloadButton({ t }: Props) {
   const canClose = phase === 'idle' || phase === 'done' || phase === 'error';
   const busy = phase === 'downloading' || phase === 'merging';
 
-  /** 基于累计字节/耗时计算速度与剩余时间，300ms 节流刷新 UI */
+  /** 基于累计字节/耗时计算速度、剩余时间与进度，300ms 节流刷新 UI */
   function updateStats() {
     const s = statsRef.current;
     const now = Date.now();
@@ -53,6 +53,7 @@ export default function DownloadButton({ t }: Props) {
       s.lastUiAt = now;
       setSpeed(avg);
       setEta(avg > 0 ? (size - s.bytes) / MB / avg : null);
+      setPercent(Math.min(99, Math.round((s.bytes / size) * 100)));
     }
   }
 
@@ -99,14 +100,21 @@ export default function DownloadButton({ t }: Props) {
     s.startedAt = Date.now();
     s.bytes = 0;
     s.lastUiAt = 0;
-    const buffers: ArrayBuffer[] = [];
+    let completed = 0;
+    const markPartDone = () => {
+      completed += 1;
+      setDoneParts(completed);
+    };
     try {
-      for (let i = 1; i <= parts; i++) {
-        buffers.push(await fetchPart(i));
-        setDoneParts(i);
-        setPercent(Math.min(99, Math.round((s.bytes / size) * 100)));
-        updateStats();
-      }
+      // 并行下载所有分片，完成后按序号拼接
+      const buffers = await Promise.all(
+        Array.from({ length: parts }, (_, idx) =>
+          fetchPart(idx + 1).then((buf) => {
+            markPartDone();
+            return buf;
+          })
+        )
+      );
       setPhase('merging');
       setPercent(100);
       setEta(null);
