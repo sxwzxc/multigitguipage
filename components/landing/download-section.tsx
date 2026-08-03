@@ -1,6 +1,6 @@
 'use client';
 
-import { Monitor, Laptop, Terminal } from 'lucide-react';
+import { Monitor, Laptop, Terminal, Download } from 'lucide-react';
 import type { Translation } from '@/lib/locales/zh';
 
 interface Props {
@@ -32,35 +32,56 @@ export default function DownloadSection({ t }: Props) {
           <p className="mono-label mt-4 inline-flex items-center gap-2">
             {t.download.version}
             <span className="rounded border border-cyan-600/30 bg-cyan-500/10 px-1.5 py-0.5 font-semibold text-primary">
-              v1.0.4
+              v1.1.5
             </span>
           </p>
         </div>
 
         <div className="mt-14 grid gap-4 md:grid-cols-3">
-          {platforms.map(({ key, icon: Icon }) => (
-            <div key={key} className="glass-card flex flex-col p-6">
-              <div className="flex items-center justify-between">
-                <Icon className="h-5 w-5 text-slate-500" />
-                <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-amber-600">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
-                  {t.download.comingSoon}
-                </span>
+          {platforms.map(({ key, icon: Icon }) => {
+            const isWindows = key === 'windows';
+            return (
+              <div key={key} className="glass-card flex flex-col p-6">
+                <div className="flex items-center justify-between">
+                  <Icon className="h-5 w-5 text-slate-500" />
+                  {isWindows ? (
+                    <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-600">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                      {t.download.downloadNow}
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-amber-600">
+                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
+                      {t.download.comingSoon}
+                    </span>
+                  )}
+                </div>
+                <h3 className="mt-5 text-lg font-medium text-slate-900">{t.download[key].name}</h3>
+                <p className="mt-1.5 font-mono text-[11px] text-primary">{t.download[key].file}</p>
+                <p className="mt-3 flex-1 text-[13px] leading-relaxed text-slate-500">
+                  {t.download[key].desc}
+                </p>
+                {isWindows ? (
+                  <a
+                    href="/downloads/MultiGitGui-Setup-1.1.5.exe"
+                    download
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-white shadow-lg shadow-cyan-600/25 transition-all hover:bg-cyan-700"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    {t.download.downloadNow}
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    className="mt-6 w-full cursor-not-allowed rounded-full border border-slate-200 bg-white/60 px-4 py-2.5 font-mono text-xs font-medium uppercase tracking-[0.14em] text-slate-400"
+                  >
+                    {t.download.comingSoon}
+                  </button>
+                )}
               </div>
-              <h3 className="mt-5 text-lg font-medium text-slate-900">{t.download[key].name}</h3>
-              <p className="mt-1.5 font-mono text-[11px] text-primary">{t.download[key].file}</p>
-              <p className="mt-3 flex-1 text-[13px] leading-relaxed text-slate-500">
-                {t.download[key].desc}
-              </p>
-              <button
-                type="button"
-                disabled
-                className="mt-6 w-full cursor-not-allowed rounded-full border border-slate-200 bg-white/60 px-4 py-2.5 font-mono text-xs font-medium uppercase tracking-[0.14em] text-slate-400"
-              >
-                {t.download.comingSoon}
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="glass-card mx-auto mt-8 max-w-3xl overflow-hidden rounded-xl">

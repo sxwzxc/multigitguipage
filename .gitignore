@@ -12,6 +12,9 @@
 /.next/
 /out/
 
+# installer source (keep only the copy under public/downloads)
+/installer/
+
 # production
 /build
 

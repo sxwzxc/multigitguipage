@@ -14,7 +14,7 @@ export const en: Translation = {
     switchLang: '中',
   },
   hero: {
-    badge: 'v1.0.4 · Cross-platform · Free & open source',
+    badge: 'v1.1.5 · Cross-platform · Free & open source',
     title1: 'One project, ',
     title2: 'every repository',
     subtitle:
@@ -80,13 +80,14 @@ export const en: Translation = {
   },
   download: {
     title: 'Download',
-    subtitle: 'Installers are being prepared — coming soon.',
+    subtitle: 'The Windows installer is ready; macOS and Linux builds are coming soon.',
     version: 'Current version',
     comingSoon: 'Coming soon',
+    downloadNow: 'Download now',
     gitReq: 'Requires Git 2.30 or newer. MultiGitGui does not bundle Git — it drives the Git you choose, so your credential helpers, hooks and SSH setup keep working.',
     windows: {
       name: 'Windows',
-      file: 'MultiGitGui-Setup-1.0.4.exe',
+      file: 'MultiGitGui-Setup-1.1.5.exe',
       desc: 'Single-file installer (NativeAOT, no .NET runtime required) with custom install path, Start Menu and desktop shortcuts.',
     },
     macos: {

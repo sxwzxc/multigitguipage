@@ -35,6 +35,7 @@ export interface Translation {
     subtitle: string;
     version: string;
     comingSoon: string;
+    downloadNow: string;
     gitReq: string;
     windows: { name: string; file: string; desc: string };
     macos: { name: string; file: string; desc: string };
@@ -71,7 +72,7 @@ export const zh: Translation = {
     switchLang: 'EN',
   },
   hero: {
-    badge: 'v1.0.4 · 跨平台 · 免费开源',
+    badge: 'v1.1.5 · 跨平台 · 免费开源',
     title1: '一个项目，',
     title2: '同时管理所有仓库',
     subtitle:
@@ -137,13 +138,14 @@ export const zh: Translation = {
   },
   download: {
     title: '下载',
-    subtitle: '安装包正在准备中，敬请期待。',
+    subtitle: 'Windows 安装包已就绪；macOS 与 Linux 版本即将推出。',
     version: '当前版本',
     comingSoon: '即将推出',
+    downloadNow: '立即下载',
     gitReq: '需要 Git 2.30 或更新版本（MultiGitGui 不内置 Git，驱动你选定的 Git，因此 credential helper、hooks 与 SSH 配置继续生效）。',
     windows: {
       name: 'Windows',
-      file: 'MultiGitGui-Setup-1.0.4.exe',
+      file: 'MultiGitGui-Setup-1.1.5.exe',
       desc: '单文件安装向导（NativeAOT 编译，无需 .NET 运行时），支持自定义安装路径、开始菜单与桌面快捷方式。',
     },
     macos: {
