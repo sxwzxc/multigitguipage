@@ -39,6 +39,13 @@ export interface Translation {
     assembling: string;
     failed: string;
     shaLabel: string;
+    dialogTitle: string;
+    dialogNotice: string;
+    merging: string;
+    done: string;
+    close: string;
+    speed: string;
+    eta: string;
     gitReq: string;
     windows: { name: string; file: string; desc: string };
     macos: { name: string; file: string; desc: string };
@@ -148,6 +155,14 @@ export const zh: Translation = {
     assembling: '正在下载并合并安装包',
     failed: '下载失败，请重试',
     shaLabel: 'SHA-256 校验和',
+    dialogTitle: '下载 MultiGitGui',
+    dialogNotice:
+      '安装包分片将在浏览器内依次下载并合并。请勿关闭或刷新此页面，否则下载将中断。',
+    merging: '正在合并安装包…',
+    done: '下载完成',
+    close: '关闭',
+    speed: '速度',
+    eta: '预计剩余',
     gitReq: '需要 Git 2.30 或更新版本（MultiGitGui 不内置 Git，驱动你选定的 Git，因此 credential helper、hooks 与 SSH 配置继续生效）。',
     windows: {
       name: 'Windows',

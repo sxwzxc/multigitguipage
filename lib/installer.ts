@@ -6,6 +6,7 @@
  */
 export const windowsInstaller = {
   file: 'MultiGitGui-Setup-1.1.5.exe',
+  size: 74030080,
   parts: 4,
   chunkSize: 20971520,
   sha256: 'd3648b4983951345462f57e87afb924458ee368245ade8407f72957ea571dfbd',
