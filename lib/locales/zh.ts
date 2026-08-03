@@ -36,6 +36,7 @@ export interface Translation {
     version: string;
     comingSoon: string;
     downloadNow: string;
+    altLabel: string;
     assembling: string;
     failed: string;
     shaLabel: string;
@@ -80,7 +81,7 @@ export const zh: Translation = {
     switchLang: 'EN',
   },
   hero: {
-    badge: 'v1.1.5 · 跨平台 · 免费',
+    badge: 'v1.1.7 · 跨平台 · 免费',
     title1: '一个项目，',
     title2: '同时管理所有仓库',
     subtitle:
@@ -150,6 +151,7 @@ export const zh: Translation = {
     version: '当前版本',
     comingSoon: '即将推出',
     downloadNow: '立即下载',
+    altLabel: '备用下载',
     assembling: '正在下载并合并安装包',
     failed: '下载失败，请重试',
     shaLabel: 'SHA-256 校验和',
@@ -164,7 +166,7 @@ export const zh: Translation = {
     gitReq: '需要 Git 2.30 或更新版本（MultiGitGui 不内置 Git，驱动你选定的 Git，因此 credential helper、hooks 与 SSH 配置继续生效）。',
     windows: {
       name: 'Windows',
-      file: 'MultiGitGui-Setup-1.1.5.exe',
+      file: 'MultiGitGui-Setup-1.1.7.exe',
       desc: '单文件安装向导（NativeAOT 编译，无需 .NET 运行时），支持自定义安装路径、开始菜单与桌面快捷方式。',
     },
     macos: {

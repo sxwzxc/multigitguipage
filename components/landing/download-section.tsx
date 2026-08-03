@@ -1,6 +1,6 @@
 'use client';
 
-import { Monitor, Laptop, Terminal } from 'lucide-react';
+import { Monitor, Laptop, Terminal, Download } from 'lucide-react';
 import DownloadButton from '@/components/landing/download-button';
 import { windowsInstaller } from '@/lib/installer';
 import type { Translation } from '@/lib/locales/zh';
@@ -24,26 +24,35 @@ export default function DownloadSection({ t }: Props) {
 
   return (
     <section id="download" className="section-anchor relative py-20 md:py-28">
-      <div className="container max-w-6xl px-4 md:px-6">
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <div className="absolute left-1/2 top-6 h-72 w-[38rem] -translate-x-1/2 rounded-full bg-cyan-400/20 blur-[110px]" />
+      </div>
+
+      <div className="container relative max-w-6xl px-4 md:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <p className="mono-label">02 · release</p>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
             {t.download.title}
           </h2>
           <p className="mt-4 text-base text-slate-600 md:text-lg">{t.download.subtitle}</p>
-          <p className="mono-label mt-4 inline-flex items-center gap-2">
+          <p className="mono-label mt-5 inline-flex items-center gap-2.5">
             {t.download.version}
-            <span className="rounded border border-cyan-600/30 bg-cyan-500/10 px-1.5 py-0.5 font-semibold text-primary">
-              v1.1.5
+            <span className="rounded-lg border border-cyan-600/30 bg-cyan-500/10 px-2.5 py-1 text-sm font-bold text-primary shadow-sm">
+              v1.1.7
             </span>
           </p>
         </div>
 
-        <div className="mt-14 grid gap-4 md:grid-cols-3">
+        <div className="mt-14 grid gap-5 md:grid-cols-3">
           {platforms.map(({ key, icon: Icon }) => {
             const isWindows = key === 'windows';
             return (
-              <div key={key} className="glass-card flex flex-col p-6">
+              <div
+                key={key}
+                className={`glass-card flex flex-col p-6 ${
+                  isWindows ? 'ring-1 ring-cyan-500/25' : ''
+                }`}
+              >
                 <div className="flex items-center justify-between">
                   <Icon className="h-5 w-5 text-slate-500" />
                   {isWindows ? (
@@ -63,15 +72,34 @@ export default function DownloadSection({ t }: Props) {
                 <p className="mt-3 flex-1 text-[13px] leading-relaxed text-slate-500">
                   {t.download[key].desc}
                 </p>
+
+                {isWindows ? (
+                  <a
+                    href={windowsInstaller.directUrl}
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-bold text-white shadow-xl shadow-cyan-600/30 transition-all hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-cyan-600/40"
+                  >
+                    <Download className="h-4 w-4" />
+                    {t.download.downloadNow}
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    disabled
+                    className="mt-6 w-full cursor-not-allowed rounded-full border border-slate-200 bg-white/60 px-5 py-3.5 text-sm font-medium text-slate-400"
+                  >
+                    {t.download.comingSoon}
+                  </button>
+                )}
+
                 {isWindows ? (
                   <DownloadButton t={t} />
                 ) : (
                   <button
                     type="button"
                     disabled
-                    className="mt-6 w-full cursor-not-allowed rounded-full border border-slate-200 bg-white/60 px-4 py-2.5 font-mono text-xs font-medium uppercase tracking-[0.14em] text-slate-400"
+                    className="mt-2.5 w-full cursor-not-allowed rounded-lg border border-slate-200 bg-white/40 px-3 py-2 font-mono text-[11px] text-slate-300"
                   >
-                    {t.download.comingSoon}
+                    {t.download.altLabel}
                   </button>
                 )}
               </div>

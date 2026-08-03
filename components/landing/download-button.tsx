@@ -139,17 +139,17 @@ export default function DownloadButton({ t }: Props) {
         type="button"
         onClick={handleDownload}
         disabled={busy}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-white shadow-lg shadow-cyan-600/25 transition-all hover:bg-cyan-700 disabled:cursor-wait disabled:opacity-80"
+        className="mt-2.5 flex w-full items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white/50 px-3 py-2 font-mono text-[11px] font-medium text-slate-500 transition-colors hover:border-slate-300 hover:text-slate-800 disabled:cursor-wait disabled:opacity-70"
       >
         {busy ? (
           <>
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <Loader2 className="h-3 w-3 animate-spin text-primary" />
             {t.download.assembling} {doneParts}/{parts}
           </>
         ) : (
           <>
-            <Download className="h-3.5 w-3.5" />
-            {t.download.downloadNow}
+            <Download className="h-3 w-3" />
+            {t.download.altLabel}
           </>
         )}
       </button>
