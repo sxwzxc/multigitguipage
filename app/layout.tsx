@@ -1,12 +1,25 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { ThemeProvider } from '@/components/theme-provider';
-import Header from '@/components/layout/header';
-import Footer from '@/components/layout/footer';
+import { zh } from '@/lib/locales/zh';
 
 export const metadata: Metadata = {
-  title: 'Brand | Creative Agency',
-  description: 'We create digital experiences that elevate your brand',
+  title: {
+    default: 'MultiGitGui',
+    template: '%s',
+  },
+  description: zh.meta.description,
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/logo.png',
+  },
+  themeColor: '#0a0e14',
+  openGraph: {
+    title: 'MultiGitGui',
+    description: zh.meta.description,
+    type: 'website',
+    locale: 'zh_CN',
+    images: ['/logo.png'],
+  },
 };
 
 export default function RootLayout({
@@ -15,21 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-sans">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </ThemeProvider>
-      </body>
+    <html lang="zh-CN" suppressHydrationWarning>
+      <body>{children}</body>
     </html>
   );
 }

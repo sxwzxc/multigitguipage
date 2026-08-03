@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
 import Landing from '@/components/landing';
-import { zh } from '@/lib/locales/zh';
+import { en } from '@/lib/locales/en';
 
 export const metadata: Metadata = {
-  title: zh.meta.title,
-  description: zh.meta.description,
+  title: en.meta.title,
+  description: en.meta.description,
 };
 
 export default function Page() {
-  return <Landing lang="zh" />;
+  return <Landing lang="en" />;
 }
