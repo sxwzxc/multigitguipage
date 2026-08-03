@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Download, Loader2, AlertCircle, ShieldCheck, TriangleAlert } from 'lucide-react';
 import {
   Dialog,
@@ -36,28 +36,56 @@ export default function DownloadButton({ t }: Props) {
   const [doneParts, setDoneParts] = useState(0);
   const [speed, setSpeed] = useState(0);
   const [eta, setEta] = useState<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const statsRef = useRef({ startedAt: 0, bytes: 0, avgSpeed: 0 });
+  const statsRef = useRef({ startedAt: 0, bytes: 0, lastUiAt: 0 });
 
   const { file, parts, size } = windowsInstaller;
   const canClose = phase === 'idle' || phase === 'done' || phase === 'error';
   const busy = phase === 'downloading' || phase === 'merging';
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
-
+  /** 基于累计字节/耗时计算速度与剩余时间，300ms 节流刷新 UI */
   function updateStats() {
     const s = statsRef.current;
-    const dt = (Date.now() - s.startedAt) / 1000;
-    if (dt < 1) return;
-    const instant = s.bytes / dt / MB;
-    s.avgSpeed = s.avgSpeed === 0 ? instant : s.avgSpeed * 0.7 + instant * 0.3;
-    setSpeed(s.avgSpeed);
-    const remain = (size - s.bytes) / MB;
-    setEta(s.avgSpeed > 0 ? remain / s.avgSpeed : null);
+    const now = Date.now();
+    const dt = (now - s.startedAt) / 1000;
+    if (dt <= 0 || s.bytes <= 0) return;
+    const avg = s.bytes / dt / MB;
+    if (now - s.lastUiAt >= 300) {
+      s.lastUiAt = now;
+      setSpeed(avg);
+      setEta(avg > 0 ? (size - s.bytes) / MB / avg : null);
+    }
+  }
+
+  /** 流式下载单个分片，边下载边累计字节数，速度实时更新 */
+  async function fetchPart(i: number): Promise<ArrayBuffer> {
+    const res = await fetch(`/downloads/${file}.part${i}`);
+    if (!res.ok) throw new Error(`part ${i} failed: ${res.status}`);
+    const s = statsRef.current;
+    if (!res.body) {
+      const buf = await res.arrayBuffer();
+      s.bytes += buf.byteLength;
+      return buf;
+    }
+    const reader = res.body.getReader();
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) {
+        chunks.push(value);
+        total += value.byteLength;
+        s.bytes += value.byteLength;
+        updateStats();
+      }
+    }
+    const merged = new Uint8Array(total);
+    let offset = 0;
+    for (const chunk of chunks) {
+      merged.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+    return merged.buffer as ArrayBuffer;
   }
 
   async function handleDownload() {
@@ -70,19 +98,15 @@ export default function DownloadButton({ t }: Props) {
     const s = statsRef.current;
     s.startedAt = Date.now();
     s.bytes = 0;
-    s.avgSpeed = 0;
-    timerRef.current = setInterval(updateStats, 1000);
+    s.lastUiAt = 0;
     const buffers: ArrayBuffer[] = [];
     try {
       for (let i = 1; i <= parts; i++) {
-        const res = await fetch(`/downloads/${file}.part${i}`);
-        if (!res.ok) throw new Error(`part ${i} failed: ${res.status}`);
-        buffers.push(await res.arrayBuffer());
-        s.bytes += buffers[buffers.length - 1].byteLength;
+        buffers.push(await fetchPart(i));
         setDoneParts(i);
         setPercent(Math.min(99, Math.round((s.bytes / size) * 100)));
+        updateStats();
       }
-      if (timerRef.current) clearInterval(timerRef.current);
       setPhase('merging');
       setPercent(100);
       setEta(null);
@@ -97,7 +121,6 @@ export default function DownloadButton({ t }: Props) {
       setTimeout(() => URL.revokeObjectURL(url), 2000);
       setPhase('done');
     } catch {
-      if (timerRef.current) clearInterval(timerRef.current);
       setPhase('error');
     }
   }
@@ -145,7 +168,8 @@ export default function DownloadButton({ t }: Props) {
 
             <div className="flex items-center justify-between font-mono text-[11px] text-slate-500">
               <span>
-                {t.download.speed} <span className="text-slate-800">{speed.toFixed(1)} MB/s</span>
+                {t.download.speed}{' '}
+                <span className="text-slate-800">{speed.toFixed(1)} MB/s</span>
               </span>
               <span>
                 {t.download.eta}{' '}
@@ -153,9 +177,7 @@ export default function DownloadButton({ t }: Props) {
                   {eta === null ? '--:--' : formatEta(eta)}
                 </span>
               </span>
-              <span className="text-slate-400">
-                {percent}%
-              </span>
+              <span className="text-slate-400">{percent}%</span>
             </div>
 
             <div
