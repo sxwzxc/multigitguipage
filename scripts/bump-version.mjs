@@ -225,6 +225,22 @@ function genApi() {
   };
   fs.writeFileSync(path.join(apiDir, 'latest.json'), JSON.stringify(latest, null, 2) + '\n', 'utf8');
 
+  // public/api/win32.json + public/api/win32 — Windows 安装包固定直链端点
+  // （URL 永远不变，内容随最新版本更新；客户端可直接用 directUrl 下载）
+  const win32 = {
+    platform: 'win32',
+    version: newVersion,
+    publishedAt: latestPublishedAt,
+    file: installerMeta.file,
+    size: installerMeta.size,
+    sha256: installerMeta.sha256,
+    directUrl: installerMeta.directUrl,
+    changelogUrl: `/api/changelog/${newVersion}.md`,
+  };
+  const win32Json = JSON.stringify(win32, null, 2) + '\n';
+  fs.writeFileSync(path.join(apiDir, 'win32.json'), win32Json, 'utf8');
+  fs.writeFileSync(path.join(apiDir, 'win32'), win32Json, 'utf8');
+
   // public/api/versions.json — 版本历史列表
   const list = versions.map((e) => ({
     version: e.version,
@@ -277,6 +293,8 @@ function genApi() {
 
   return {
     latest: 'public/api/latest.json',
+    win32: 'public/api/win32.json',
+    win32Alias: 'public/api/win32',
     versions: 'public/api/versions.json',
     versionDetails: versions.map((v) => `public/api/versions/${v.version}.json`),
     changelogFiles: versions.map((v) => `public/api/changelog/${v.version}.md`),

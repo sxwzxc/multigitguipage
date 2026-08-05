@@ -59,8 +59,8 @@
    - 替换版本号引用（旧版 → 新版）：`lib/locales/zh.ts`、`lib/locales/en.ts`
      （`hero.badge`、`download.windows.file`）、`components/landing/download-section.tsx`（`v<版本>` 徽章）
    - 把 changelog 以 `## <版本> (<日期>)` 段落入库 `CHANGELOG.md`（同版本替换、否则置顶插入），
-     并从 `CHANGELOG.md` 全量重建 `public/api/` 端点（latest.json、versions.json、
-     versions/<版本>.json、changelog/<版本>.md、changelog.md，孤儿版本文件自动清理）
+     并从 `CHANGELOG.md` 全量重建 `public/api/` 端点（latest.json、win32.json/win32、
+     versions.json、versions/<版本>.json、changelog/<版本>.md、changelog.md，孤儿版本文件自动清理）
 2. `npm run build` 验证构建（`/` 与 `/en` 静态导出成功、无类型错误）。
 3. `git add -A && git commit && git push origin main`（自动触发 EdgeOne Pages 部署）。
 

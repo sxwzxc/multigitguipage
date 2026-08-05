@@ -68,6 +68,7 @@ CHANGELOG.md         # 版本更新日志（由 scripts/bump-version.mjs 从 Rel
 | 端点 | 用途 |
 |---|---|
 | `GET /api/latest.json` | 更新检测：最新版本 + 安装包元数据（文件名/大小/SHA-256/直链/分片）+ changelog 链接 |
+| `GET /api/win32`（或 `/api/win32.json`） | **Windows 安装包固定直链端点**：URL 永远不变，内容随最新版本更新，`directUrl` 即直链 |
 | `GET /api/versions.json` | 版本历史列表（`latest` + 全部版本及 changelog 链接） |
 | `GET /api/versions/<版本>.json` | 指定版本详情（当前最新版本含安装包元数据，历史版本仅基础信息） |
 | `GET /api/changelog/<版本>.md` | 指定版本 changelog 原文（markdown） |
