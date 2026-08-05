@@ -1,6 +1,6 @@
 'use client';
 
-import { Monitor, Laptop, Terminal, Download } from 'lucide-react';
+import { Monitor, Laptop, Terminal, Download, Github } from 'lucide-react';
 import DownloadButton from '@/components/landing/download-button';
 import { windowsInstaller } from '@/lib/installer';
 import type { Translation } from '@/lib/locales/zh';
@@ -8,6 +8,8 @@ import type { Translation } from '@/lib/locales/zh';
 interface Props {
   t: Translation;
 }
+
+const GITHUB_RELEASES = 'https://github.com/sxwzxc/multigitguipage/releases';
 
 const icons = {
   windows: Monitor,
@@ -63,7 +65,7 @@ export default function DownloadSection({ t }: Props) {
                   ) : (
                     <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-amber-600">
                       <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500" />
-                      {t.download.comingSoon}
+                      {t.download.goToGithub}
                     </span>
                   )}
                 </div>
@@ -82,25 +84,31 @@ export default function DownloadSection({ t }: Props) {
                     {t.download.downloadNow}
                   </a>
                 ) : (
-                  <button
-                    type="button"
-                    disabled
-                    className="mt-6 w-full cursor-not-allowed rounded-full border border-slate-200 bg-white/60 px-5 py-3.5 text-sm font-medium text-slate-400"
+                  <a
+                    href={GITHUB_RELEASES}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-6 flex w-full items-center justify-center gap-2 rounded-full border border-slate-300 bg-white/70 px-5 py-3.5 text-sm font-semibold text-slate-700 transition-all hover:-translate-y-0.5 hover:border-cyan-600/40 hover:text-primary"
                   >
-                    {t.download.comingSoon}
-                  </button>
+                    <Github className="h-4 w-4" />
+                    {t.download.goToGithub}
+                  </a>
                 )}
 
                 {isWindows ? (
                   <DownloadButton t={t} />
                 ) : (
-                  <button
-                    type="button"
-                    disabled
-                    className="mt-2.5 w-full cursor-not-allowed rounded-lg border border-slate-200 bg-white/40 px-3 py-2 font-mono text-[11px] text-slate-300"
-                  >
-                    {t.download.altLabel}
-                  </button>
+                  <p className="mt-2.5 text-center font-mono text-[11px] leading-4 text-slate-400">
+                    {t.download.githubNote}
+                    <a
+                      href={GITHUB_RELEASES}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="break-all text-primary underline underline-offset-2 hover:text-cyan-700"
+                    >
+                      github.com/sxwzxc/multigitguipage/releases
+                    </a>
+                  </p>
                 )}
               </div>
             );
@@ -121,10 +129,6 @@ export default function DownloadSection({ t }: Props) {
               <span className="ml-2 text-slate-500">git version 2.30+ required</span>
             </p>
             <p className="text-slate-500">{t.download.gitReq}</p>
-            <p className="pt-1">
-              <span className="text-slate-500">{t.download.shaLabel}</span>
-              <span className="ml-2 break-all text-slate-400">{windowsInstaller.sha256}</span>
-            </p>
           </div>
         </div>
       </div>

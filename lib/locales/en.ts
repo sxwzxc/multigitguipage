@@ -80,14 +80,15 @@ export const en: Translation = {
   },
   download: {
     title: 'Download',
-    subtitle: 'The Windows installer is ready; macOS and Linux builds are coming soon.',
+    subtitle: 'The Windows installer is ready; get macOS and Linux builds from GitHub Releases.',
     version: 'Current version',
     comingSoon: 'Coming soon',
     downloadNow: 'Download now',
+    goToGithub: 'Download from GitHub',
+    githubNote: 'Quick download is not available for non-Windows yet — get it from GitHub:',
     altLabel: 'Alternate download',
     assembling: 'Downloading & assembling installer',
     failed: 'Download failed, please retry',
-    shaLabel: 'SHA-256 checksum',
     dialogTitle: 'Download MultiGitGui',
     dialogNotice:
       'Installer parts are downloaded and assembled in your browser. Keep this page open — closing or refreshing will interrupt the download.',

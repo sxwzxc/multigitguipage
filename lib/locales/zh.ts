@@ -36,10 +36,11 @@ export interface Translation {
     version: string;
     comingSoon: string;
     downloadNow: string;
+    goToGithub: string;
+    githubNote: string;
     altLabel: string;
     assembling: string;
     failed: string;
-    shaLabel: string;
     dialogTitle: string;
     dialogNotice: string;
     merging: string;
@@ -147,14 +148,15 @@ export const zh: Translation = {
   },
   download: {
     title: '下载',
-    subtitle: 'Windows 安装包已就绪；macOS 与 Linux 版本即将推出。',
+    subtitle: 'Windows 安装包可直接下载；macOS 与 Linux 版本请前往 GitHub Releases 获取。',
     version: '当前版本',
     comingSoon: '即将推出',
     downloadNow: '立即下载',
+    goToGithub: '前往 GitHub 下载',
+    githubNote: '非 Windows 版本尚未配置快速下载，请暂时通过 GitHub 下载：',
     altLabel: '备用下载',
     assembling: '正在下载并合并安装包',
     failed: '下载失败，请重试',
-    shaLabel: 'SHA-256 校验和',
     dialogTitle: '下载 MultiGitGui',
     dialogNotice:
       '安装包分片将在浏览器内依次下载并合并。请勿关闭或刷新此页面，否则下载将中断。',
