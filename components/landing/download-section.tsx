@@ -38,7 +38,7 @@ export default function DownloadSection({ t }: Props) {
           <p className="mono-label mt-5 inline-flex items-center gap-2.5">
             {t.download.version}
             <span className="rounded-lg border border-cyan-600/30 bg-cyan-500/10 px-2.5 py-1 text-sm font-bold text-primary shadow-sm">
-              v1.3.3
+              v1.3.6
             </span>
           </p>
         </div>
