@@ -1,0 +1,98 @@
+name: Copy release assets from MultiGitGui
+
+# 手动触发：从 sxwzxc/MultiGitGui 最新 Release 复制非源码产物（文档、说明、各类安装包等，
+# 排除源码包与 MultiGitGui-Setup-*.exe——后者由 Update installer workflow 分片处理）
+# 到本仓库 public/release-assets/<tag>/ 归档；成功后自动触发 Update installer 工作流。
+#
+# 注意：单文件超过 20MiB 的资产会被跳过（EdgeOne Pages 单文件限制 25MiB），
+# 避免破坏静态部署。
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'MultiGitGui release tag to fetch (default: latest)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve release assets
+        id: release
+        env:
+          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          if [ -n "$TAG" ]; then
+            api="https://api.github.com/repos/sxwzxc/MultiGitGui/releases/tags/${TAG}"
+          else
+            api="https://api.github.com/repos/sxwzxc/MultiGitGui/releases/latest"
+          fi
+          json="$(curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/vnd.github+json" "${api}")"
+          tag="$(printf '%s' "$json" | jq -r .tag_name)"
+          if [ -z "$tag" ] || [ "$tag" = "null" ]; then
+            echo "::error::Release not found"
+            exit 1
+          fi
+          printf '%s' "$json" | jq -r '.assets[] | [.name, .url] | @tsv' > /tmp/assets.tsv
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "Resolved release: ${tag}, assets: $(wc -l < /tmp/assets.tsv)"
+
+      - name: Download assets
+        env:
+          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          dir="public/release-assets/${{ steps.release.outputs.tag }}"
+          mkdir -p "$dir"
+          while IFS=$'\t' read -r name url; do
+            name="$(basename -- "$name")"
+            if [[ "$name" == MultiGitGui-Setup-*.exe ]]; then
+              echo "skip installer (handled by Update installer workflow): ${name}"
+              continue
+            fi
+            curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/octet-stream" \
+              -o "${dir}/${name}" "${url}"
+            size="$(stat -c%s "${dir}/${name}")"
+            if (( size > 20971520 )); then
+              echo "::warning::${name} is ${size} bytes (> 20MiB), skipped to stay under EdgeOne 25MiB limit"
+              rm -f "${dir}/${name}"
+            else
+              echo "copied: ${name} (${size} bytes)"
+            fi
+          done < /tmp/assets.tsv
+          ls -lh "${dir}"
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          tag="${{ steps.release.outputs.tag }}"
+          git add public/release-assets
+          if git diff --cached --quiet; then
+            echo "No new assets to commit"
+          else
+            git commit -m "chore: sync release assets from MultiGitGui ${tag}"
+            git push
+          fi
+
+      - name: Trigger installer update workflow
+        env:
+          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+        run: |
+          curl -fsSL -X POST \
+            -H "Authorization: Bearer ${GH_API_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -d '{"ref":"main"}' \
+            "https://api.github.com/repos/sxwzxc/multigitguipage/actions/workflows/update-installer.yml/dispatches"
+          echo "Dispatched update-installer.yml"
