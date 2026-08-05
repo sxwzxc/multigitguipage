@@ -132,12 +132,15 @@ const changelogRoot = path.join(root, 'CHANGELOG.md');
 const escVersion = newVersion.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 let changelogUpdated = false;
 
-// 按 "## " 行切分：header 为文件头（可能为空），sections 为各版本段落。
-// 注意：V8 的 split 会跳过位置 0 的零宽匹配，文件以 "## " 开头时
+// 按顶层版本段落切分：段落标题必须是 "## <版本> (<日期>)" 格式（版本号+括号日期）。
+// 注意：release 资产的 CHANGELOG.md 常为全量历史（含 "# 总标题" 与 "## x.y.z - 日期"
+// 子段落），这些子段落会作为 body 内容保留，不得作为切分点；
+// 否则单版本 changelog 文件会被切得只剩标题。
+// 另注意：V8 的 split 会跳过位置 0 的零宽匹配，文件以段落标题开头时
 // 第一个段落会落在 parts[0]，需单独判断。
 function splitSections(content) {
-  const parts = content.split(/^(?=## )/m);
-  if (parts.length > 0 && parts[0].startsWith('## ')) {
+  const parts = content.split(/^(?=## \d+\.\d+\.\d+ \()/m);
+  if (parts.length > 0 && /^## \d+\.\d+\.\d+ \(/.test(parts[0])) {
     return { header: '', sections: parts };
   }
   return { header: parts[0] ?? '', sections: parts.slice(1) };
