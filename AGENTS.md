@@ -1,5 +1,15 @@
 # MultiGitGui 官网 — Agent 工作约定
 
+## 版本发布入口
+
+**优先使用 GitHub Actions**：在仓库 Actions 页手动运行 `Update installer from MultiGitGui release`
+（workflow_dispatch）——自动获取 `sxwzxc/MultiGitGui` 最新 Release、按 `MultiGitGui-Setup-*.exe`
+匹配安装包资产、下载 → 分片入库 → 更新直链与版本号 → 构建验证 → 提交推送，全程无需本地操作。
+该 workflow 只更新代码与分片，**直链服务器（multigit.shenxw.cn）上的安装包与 index.html 仍需
+通过 FTP 另行同步**（见下）。
+
+以下为本地手动流程（workflow 不可用或需要手工干预时执行）：
+
 ## 版本发布流程（用户说"更新版本 / 更新安装包"时执行）
 
 从 `installer/` 目录获取最新离线安装包（如 `MultiGitGui-Setup-<version>.exe`），

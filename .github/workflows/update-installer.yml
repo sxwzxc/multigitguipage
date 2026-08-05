@@ -1,5 +1,9 @@
 name: Update installer from MultiGitGui release
 
+# 手动触发：自动获取 sxwzxc/MultiGitGui 最新 Release，按 MultiGitGui-Setup-*.exe 匹配
+# 安装包资产，下载 → 分片入库 → 更新直链与版本号 → 构建验证 → 提交推送。
+# 注意：直链指向 multigit.shenxw.cn，该服务器上的安装包与 index.html 需另行同步（FTP）。
+
 on:
   workflow_dispatch:
     inputs:
@@ -38,16 +42,22 @@ jobs:
             api="https://api.github.com/repos/sxwzxc/MultiGitGui/releases/latest"
           fi
           json="$(curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/vnd.github+json" "${api}")"
-          asset="$(printf '%s' "$json" | jq -r '.assets[] | select(.name | test("^MultiGitGui-Setup-[0-9]+\\.[0-9]+\\.[0-9]+\\.exe$")) | .name' | head -n 1)"
+          asset="$(printf '%s' "$json" | jq -r '.assets[] | select(.name | test("^MultiGitGui-Setup-.*\\.exe$")) | .name' | sort -V | tail -n 1)"
           if [ -z "$asset" ] || [ "$asset" = "null" ]; then
             echo "::error::No MultiGitGui-Setup-*.exe asset in release. Available assets:"
             printf '%s' "$json" | jq -r '.assets[].name' | sed 's/^/  - /'
             exit 1
           fi
+          version="$(printf '%s' "$asset" | sed -E 's/^MultiGitGui-Setup-([0-9]+\.[0-9]+\.[0-9]+)\.exe$/\1/')"
+          if [ -z "$version" ] || [ "$version" = "$asset" ]; then
+            echo "::error::Asset name does not match MultiGitGui-Setup-<major.minor.patch>.exe: ${asset}"
+            exit 1
+          fi
           url="$(printf '%s' "$json" | jq -r --arg n "$asset" '.assets[] | select(.name == $n) | .url')"
           echo "asset=${asset}" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "url=${url}" >> "$GITHUB_OUTPUT"
-          echo "Resolved asset: ${asset}"
+          echo "Resolved asset: ${asset} (v${version})"
 
       - name: Download installer
         env:
@@ -106,7 +116,7 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          ver="$(jq -r .file /tmp/shard-meta.json | sed -E 's/^MultiGitGui-Setup-([0-9]+\.[0-9]+\.[0-9]+)\.exe$/\1/')"
+          ver="${{ steps.release.outputs.version }}"
           git add -A
           if git diff --cached --quiet; then
             echo "No changes to commit"
