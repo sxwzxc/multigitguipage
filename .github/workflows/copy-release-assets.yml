@@ -56,7 +56,7 @@ jobs:
           if [ "$code" = "404" ]; then
             body="Auto-forwarded from the MultiGitGui release (private repo).
 
-$(cat /tmp/release-body.md)"
+            $(cat /tmp/release-body.md)"
             payload="$(jq -n --arg tag "$tag" --arg name "MultiGitGui $tag" --arg body "$body" '{tag_name:$tag,name:$name,body:$body}')"
             curl -fsSL -X POST \
               -H "Authorization: Bearer ${GITHUB_TOKEN}" \
