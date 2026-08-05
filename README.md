@@ -32,6 +32,8 @@ components/ui/       # shadcn/ui 基础组件
 lib/locales/         # 中英文文案字典
 public/              # Logo、favicon 与安装包
 public/downloads/    # 安装包（随仓库托管，部署后可直接下载）
+public/api/          # 更新检测/获取 API 端点（由 scripts/bump-version.mjs 发布时生成）
+CHANGELOG.md         # 版本更新日志（由 scripts/bump-version.mjs 从 Release 入库）
 ```
 
 ## 下载与安装包
@@ -48,12 +50,51 @@ public/downloads/    # 安装包（随仓库托管，部署后可直接下载）
   # 1. 源安装包放入 installer/ 目录后分片（自动清理同名旧分片，输出元数据与校验和）
   node scripts/split-installer.mjs installer/MultiGitGui-Setup-<version>.exe public/downloads
   # 2. 手动删除 public/downloads/ 中旧版本的分片文件
-  # 3. 将脚本输出的元数据更新到 lib/installer.ts，并更新 directUrl 直链
+  # 3. 更新元数据与版本号：从 Release 下载 CHANGELOG.md，连同 published_at 一并入库并生成 API 端点
+  node scripts/bump-version.mjs MultiGitGui-Setup-<version>.exe <size> <parts> <sha256> \
+    --changelog /path/to/CHANGELOG.md --published-at <ISO时间>
+  #    （不传 --changelog 时跳过入库，仅重建 API 端点；lib/installer.ts 与全站版本号始终更新）
   # 4. 同步更新 lib/locales/zh.ts 与 en.ts 中的版本号（hero 徽章、下载区徽章、Windows 文件名）
   ```
 
 - 源安装包目录 `installer/` 已被 `.gitignore` 忽略，仅跟踪 `public/downloads/` 中的分片副本。
 - 用户下载后可在终端用 `Get-FileHash` / `sha256sum` 与页面展示的 SHA-256 校验和比对，确认文件完整。
+
+## 更新检测 / 更新获取 API
+
+网站为静态导出，无服务端路由；以下端点均为 `public/api/` 下的静态文件，随部署发布，
+可供 MultiGitGui 客户端做「检查更新」与「获取更新信息」，也可在浏览器直接访问：
+
+| 端点 | 用途 |
+|---|---|
+| `GET /api/latest.json` | 更新检测：最新版本 + 安装包元数据（文件名/大小/SHA-256/直链/分片）+ changelog 链接 |
+| `GET /api/versions.json` | 版本历史列表（`latest` + 全部版本及 changelog 链接） |
+| `GET /api/versions/<版本>.json` | 指定版本详情（当前最新版本含安装包元数据，历史版本仅基础信息） |
+| `GET /api/changelog/<版本>.md` | 指定版本 changelog 原文（markdown） |
+| `GET /api/changelog.md` | 全部版本合并 changelog（即 `CHANGELOG.md` 副本） |
+
+`latest.json` 响应示例：
+
+```json
+{
+  "version": "1.3.15",
+  "publishedAt": "2025-06-01T10:00:00Z",
+  "changelogUrl": "/api/changelog/1.3.15.md",
+  "installer": {
+    "file": "MultiGitGui-Setup-1.3.15.exe",
+    "size": 75969024,
+    "parts": 4,
+    "chunkSize": 20971520,
+    "sha256": "700c544b…",
+    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-1.3.15.exe"
+  }
+}
+```
+
+- `changelogUrl` 为相对路径，客户端请基于其请求 `latest.json` 的 base URL 拼接。
+- 页面下载区的「更新日志」弹窗即通过 `latest.json → changelogUrl` 拉取并渲染。
+- **不要手改 `public/api/` 下的文件**：它们由 `scripts/bump-version.mjs` 幂等生成（同版本段落替换、
+  置顶插入、孤儿版本文件自动清理），下次运行会覆盖。
 
 ## 维护提示
 

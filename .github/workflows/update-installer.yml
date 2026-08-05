@@ -54,10 +54,21 @@ jobs:
             exit 1
           fi
           url="$(printf '%s' "$json" | jq -r --arg n "$asset" '.assets[] | select(.name == $n) | .url')"
+          changelog="$(printf '%s' "$json" | jq -r '.assets[] | select(.name | test("^CHANGELOG\\.md$"; "i")) | .name' | head -n 1)"
+          if [ -z "$changelog" ] || [ "$changelog" = "null" ]; then
+            echo "::error::No CHANGELOG.md asset in release. Available assets:"
+            printf '%s' "$json" | jq -r '.assets[].name' | sed 's/^/  - /'
+            exit 1
+          fi
+          changelog_url="$(printf '%s' "$json" | jq -r --arg n "$changelog" '.assets[] | select(.name == $n) | .url')"
+          published_at="$(printf '%s' "$json" | jq -r '.published_at // empty')"
           echo "asset=${asset}" >> "$GITHUB_OUTPUT"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "url=${url}" >> "$GITHUB_OUTPUT"
-          echo "Resolved asset: ${asset} (v${version})"
+          echo "changelog=${changelog}" >> "$GITHUB_OUTPUT"
+          echo "changelog_url=${changelog_url}" >> "$GITHUB_OUTPUT"
+          echo "published_at=${published_at}" >> "$GITHUB_OUTPUT"
+          echo "Resolved asset: ${asset} (v${version}), changelog: ${changelog}"
 
       - name: Download installer
         env:
@@ -69,6 +80,17 @@ jobs:
             -o "installer/${{ steps.release.outputs.asset }}" \
             "${{ steps.release.outputs.url }}"
           ls -lh "installer/${{ steps.release.outputs.asset }}"
+
+      - name: Download CHANGELOG.md
+        env:
+          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/octet-stream" \
+            -o /tmp/CHANGELOG.md \
+            "${{ steps.release.outputs.changelog_url }}"
+          echo "Downloaded ${{ steps.release.outputs.changelog }}:"
+          head -n 5 /tmp/CHANGELOG.md
 
       - name: Remove stale shards
         run: rm -f public/downloads/*.part*
@@ -105,7 +127,9 @@ jobs:
           size="$(printf '%s' "$meta" | jq -r .size)"
           parts="$(printf '%s' "$meta" | jq -r .parts)"
           sha="$(printf '%s' "$meta" | jq -r .sha256)"
-          node scripts/bump-version.mjs "${file}" "${size}" "${parts}" "${sha}"
+          node scripts/bump-version.mjs "${file}" "${size}" "${parts}" "${sha}" \
+            --changelog /tmp/CHANGELOG.md \
+            --published-at "${{ steps.release.outputs.published_at }}"
           git diff --stat
 
       - name: Build

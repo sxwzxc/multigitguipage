@@ -5,8 +5,10 @@
 **优先使用 GitHub Actions**：在仓库 Actions 页手动运行 `Update installer from MultiGitGui release`
 （workflow_dispatch）——自动获取 `sxwzxc/MultiGitGui` 最新 Release、按 `MultiGitGui-Setup-*.exe`
 匹配安装包资产、下载 → 分片入库 → 更新直链与版本号 → 构建验证 → 提交推送，全程无需本地操作。
-该 workflow 只更新代码与分片，**直链服务器（multigit.shenxw.cn）上的安装包与 index.html 仍需
-通过 FTP 另行同步**（见下）。
+该 workflow **要求 release 必须携带 `CHANGELOG.md` 资产**（缺失即报错退出）：下载后由
+`scripts/bump-version.mjs` 入库到仓库根 `CHANGELOG.md` 并生成更新检测/获取 API 端点
+（`public/api/`，见下）。该 workflow 只更新代码与分片，**直链服务器（multigit.shenxw.cn）上的
+安装包与 index.html 仍需通过 FTP 另行同步**（见下）。
 
 另有 `Forward MultiGitGui release to this repo`（手动触发）：把 private 仓库
 `sxwzxc/MultiGitGui` 的最新 Release **转发发布到本仓库（public）的 GitHub Release**
@@ -50,13 +52,29 @@
 
 ### 3. 更新代码
 
-1. `lib/installer.ts`：更新 `file`、`size`、`parts`、`chunkSize`、`sha256`（取脚本输出），
-   拼接直链 `directUrl: 'https://multigit.shenxw.cn/<文件名>'`。
-2. 更新版本号引用（旧版 → 新版）：
-   - `lib/locales/zh.ts` 与 `lib/locales/en.ts`：`hero.badge`、`download.windows.file`
-   - `components/landing/download-section.tsx`：版本徽章（`v<版本>`）
-3. `npm run build` 验证构建（`/` 与 `/en` 静态导出成功、无类型错误）。
-4. `git add -A && git commit && git push origin main`（自动触发 EdgeOne Pages 部署）。
+1. 从 Release 下载 `CHANGELOG.md`（若 release 不携带则跳过入库，仅重建端点）：
+   `node scripts/bump-version.mjs <新文件名> <size> <parts> <sha256> --changelog <CHANGELOG.md> --published-at <ISO时间>`
+   脚本会自动完成：
+   - 重写 `lib/installer.ts`（`file`/`size`/`parts`/`chunkSize`/`sha256`/`directUrl` 直链）
+   - 替换版本号引用（旧版 → 新版）：`lib/locales/zh.ts`、`lib/locales/en.ts`
+     （`hero.badge`、`download.windows.file`）、`components/landing/download-section.tsx`（`v<版本>` 徽章）
+   - 把 changelog 以 `## <版本> (<日期>)` 段落入库 `CHANGELOG.md`（同版本替换、否则置顶插入），
+     并从 `CHANGELOG.md` 全量重建 `public/api/` 端点（latest.json、versions.json、
+     versions/<版本>.json、changelog/<版本>.md、changelog.md，孤儿版本文件自动清理）
+2. `npm run build` 验证构建（`/` 与 `/en` 静态导出成功、无类型错误）。
+3. `git add -A && git commit && git push origin main`（自动触发 EdgeOne Pages 部署）。
+
+### 4. 更新检测 / 更新获取 API 端点
+
+站点为静态导出（无服务端路由），端点为 `public/api/` 下静态文件，部署后即可访问：
+
+- `GET /api/latest.json` — 更新检测：最新版本 + 安装包元数据 + `changelogUrl`（相对路径，客户端基于请求 base URL 拼接）
+- `GET /api/versions.json` — 版本历史列表
+- `GET /api/versions/<版本>.json` — 指定版本详情（当前版本含 installer，历史版本 installer 为 null）
+- `GET /api/changelog/<版本>.md` — 指定版本 changelog 原文
+- `GET /api/changelog.md` — 全部版本合并 changelog（即 `CHANGELOG.md` 副本）
+
+**不要手改 `public/api/` 与 `CHANGELOG.md`**：由 `bump-version.mjs` 幂等生成（下次发布覆盖）。
 
 ### 踩坑点
 
@@ -66,6 +84,7 @@
 - 旧分片 / FTP 旧安装包必须按版本号精确删除，防止新旧版本文件并存。
 - 直链域名固定为 `multigit.shenxw.cn`，文件命名规则 `MultiGitGui-Setup-<version>.exe`。
 - `installer/` 目录已被 `.gitignore` 忽略：仅跟踪 `public/downloads/` 中的分片副本。
+- release 缺少 `CHANGELOG.md` 资产时工作流会直接报错——发布前确认源仓库 release 已附带该文件。
 
 ## 其他约定
 

@@ -89,6 +89,11 @@ export const en: Translation = {
     altLabel: 'Alternate download',
     assembling: 'Downloading & assembling installer',
     failed: 'Download failed, please retry',
+    changelog: 'Changelog',
+    changelogDesc: 'Release notes for each version, from official releases.',
+    changelogLoading: 'Loading changelog…',
+    changelogFailed: 'Failed to load the changelog, please retry',
+    changelogRetry: 'Retry',
     dialogTitle: 'Download MultiGitGui',
     dialogNotice:
       'Installer parts are downloaded and assembled in your browser. Keep this page open — closing or refreshing will interrupt the download.',

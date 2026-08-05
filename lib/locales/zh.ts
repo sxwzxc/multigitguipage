@@ -41,6 +41,11 @@ export interface Translation {
     altLabel: string;
     assembling: string;
     failed: string;
+    changelog: string;
+    changelogDesc: string;
+    changelogLoading: string;
+    changelogFailed: string;
+    changelogRetry: string;
     dialogTitle: string;
     dialogNotice: string;
     merging: string;
@@ -157,6 +162,11 @@ export const zh: Translation = {
     altLabel: '备用下载',
     assembling: '正在下载并合并安装包',
     failed: '下载失败，请重试',
+    changelog: '更新日志',
+    changelogDesc: '各版本的发布说明，来自官方 Release。',
+    changelogLoading: '正在加载更新日志…',
+    changelogFailed: '更新日志加载失败，请稍后重试',
+    changelogRetry: '重试',
     dialogTitle: '下载 MultiGitGui',
     dialogNotice:
       '安装包分片将在浏览器内依次下载并合并。请勿关闭或刷新此页面，否则下载将中断。',

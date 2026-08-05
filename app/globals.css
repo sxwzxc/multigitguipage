@@ -192,4 +192,73 @@
   .section-anchor {
     scroll-margin-top: 6rem;
   }
+
+  /* 更新日志弹窗中的 markdown 渲染（marked 输出） */
+  .changelog-md > :first-child {
+    margin-top: 0;
+  }
+  .changelog-md > :last-child {
+    margin-bottom: 0;
+  }
+  .changelog-md h1,
+  .changelog-md h2,
+  .changelog-md h3,
+  .changelog-md h4 {
+    @apply font-semibold tracking-tight text-slate-900;
+  }
+  .changelog-md h1 {
+    @apply mb-2 mt-4 text-lg;
+  }
+  .changelog-md h2 {
+    @apply mb-2 mt-5 text-base;
+  }
+  .changelog-md h3 {
+    @apply mb-1.5 mt-4 text-sm;
+  }
+  .changelog-md h4 {
+    @apply mb-1 mt-3 text-sm;
+  }
+  .changelog-md p {
+    @apply my-2;
+  }
+  .changelog-md ul {
+    @apply my-2 list-disc space-y-1 pl-5;
+  }
+  .changelog-md ol {
+    @apply my-2 list-decimal space-y-1 pl-5;
+  }
+  .changelog-md li > ul {
+    @apply my-1;
+  }
+  .changelog-md a {
+    @apply text-primary underline underline-offset-2 hover:text-cyan-700;
+  }
+  .changelog-md code {
+    @apply rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-slate-800;
+  }
+  .changelog-md pre {
+    @apply my-3 overflow-x-auto rounded-lg bg-slate-900 p-3;
+  }
+  .changelog-md pre code {
+    @apply bg-transparent p-0 text-slate-100;
+  }
+  .changelog-md blockquote {
+    @apply my-3 border-l-2 border-cyan-600/30 pl-3 text-slate-500;
+  }
+  .changelog-md hr {
+    @apply my-4 border-slate-200;
+  }
+  .changelog-md img {
+    @apply my-3 max-w-full rounded-lg;
+  }
+  .changelog-md table {
+    @apply my-3 w-full border-collapse text-sm;
+  }
+  .changelog-md th,
+  .changelog-md td {
+    @apply border border-slate-200 px-2.5 py-1.5 text-left;
+  }
+  .changelog-md th {
+    @apply bg-slate-50 font-semibold text-slate-800;
+  }
 }

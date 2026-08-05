@@ -2,6 +2,7 @@
 
 import { Monitor, Laptop, Terminal, Download, Github } from 'lucide-react';
 import DownloadButton from '@/components/landing/download-button';
+import ChangelogDialog from '@/components/landing/changelog-dialog';
 import { windowsInstaller } from '@/lib/installer';
 import type { Translation } from '@/lib/locales/zh';
 
@@ -42,6 +43,7 @@ export default function DownloadSection({ t }: Props) {
             <span className="rounded-lg border border-cyan-600/30 bg-cyan-500/10 px-2.5 py-1 text-sm font-bold text-primary shadow-sm">
               v1.3.20
             </span>
+            <ChangelogDialog t={t} />
           </p>
         </div>
 
