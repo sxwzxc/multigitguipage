@@ -1,0 +1,116 @@
+name: Update installer from MultiGitGui release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'MultiGitGui release tag to fetch (default: latest)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve installer asset
+        id: release
+        env:
+          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          if [ -n "$TAG" ]; then
+            api="https://api.github.com/repos/sxwzxc/MultiGitGui/releases/tags/${TAG}"
+          else
+            api="https://api.github.com/repos/sxwzxc/MultiGitGui/releases/latest"
+          fi
+          json="$(curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/vnd.github+json" "${api}")"
+          asset="$(printf '%s' "$json" | jq -r '.assets[] | select(.name | test("^MultiGitGui-Setup-[0-9]+\\.[0-9]+\\.[0-9]+\\.exe$")) | .name' | head -n 1)"
+          if [ -z "$asset" ] || [ "$asset" = "null" ]; then
+            echo "::error::No MultiGitGui-Setup-*.exe asset in release. Available assets:"
+            printf '%s' "$json" | jq -r '.assets[].name' | sed 's/^/  - /'
+            exit 1
+          fi
+          url="$(printf '%s' "$json" | jq -r --arg n "$asset" '.assets[] | select(.name == $n) | .url')"
+          echo "asset=${asset}" >> "$GITHUB_OUTPUT"
+          echo "url=${url}" >> "$GITHUB_OUTPUT"
+          echo "Resolved asset: ${asset}"
+
+      - name: Download installer
+        env:
+          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p installer
+          curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/octet-stream" \
+            -o "installer/${{ steps.release.outputs.asset }}" \
+            "${{ steps.release.outputs.url }}"
+          ls -lh "installer/${{ steps.release.outputs.asset }}"
+
+      - name: Remove stale shards
+        run: rm -f public/downloads/*.part*
+
+      - name: Shard installer
+        run: |
+          set -euo pipefail
+          node scripts/split-installer.mjs "installer/${{ steps.release.outputs.asset }}" public/downloads --emit /tmp/shard-meta.json
+          cat /tmp/shard-meta.json
+
+      - name: Verify shards
+        run: |
+          node -e "
+            const fs = require('fs');
+            const crypto = require('crypto');
+            const meta = JSON.parse(fs.readFileSync('/tmp/shard-meta.json', 'utf8'));
+            const chunks = Array.from({ length: meta.parts }, (_, i) =>
+              fs.readFileSync('public/downloads/' + meta.file + '.part' + (i + 1))
+            );
+            const merged = Buffer.concat(chunks);
+            const sha = crypto.createHash('sha256').update(merged).digest('hex');
+            if (sha !== meta.sha256 || merged.length !== meta.size) {
+              console.error('SHA-256 mismatch: ' + sha);
+              process.exit(1);
+            }
+            console.log('Shards verified: ' + merged.length + ' bytes, sha256=' + sha);
+          "
+
+      - name: Bump version references
+        run: |
+          set -euo pipefail
+          meta="$(cat /tmp/shard-meta.json)"
+          file="$(printf '%s' "$meta" | jq -r .file)"
+          size="$(printf '%s' "$meta" | jq -r .size)"
+          parts="$(printf '%s' "$meta" | jq -r .parts)"
+          sha="$(printf '%s' "$meta" | jq -r .sha256)"
+          node scripts/bump-version.mjs "${file}" "${size}" "${parts}" "${sha}"
+          git diff --stat
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ver="$(jq -r .file /tmp/shard-meta.json | sed -E 's/^MultiGitGui-Setup-([0-9]+\.[0-9]+\.[0-9]+)\.exe$/\1/')"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "feat: installer v${ver} synced from MultiGitGui release"
+          git push

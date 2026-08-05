@@ -2,13 +2,14 @@
  * 将安装包按大小切分为多片，供 EdgeOne Pages 静态托管（单文件限制 25MiB）。
  *
  * 用法:
- *   node scripts/split-installer.mjs <源文件> [输出目录] [分片大小，默认 20MiB]
+ *   node scripts/split-installer.mjs <源文件> [输出目录] [分片大小，默认 20MiB] [--emit <元数据文件>]
  *
  * 示例:
  *   node scripts/split-installer.mjs installer/MultiGitGui-Setup-1.1.5.exe public/downloads
+ *   node scripts/split-installer.mjs installer/x.exe public/downloads --emit /tmp/meta.json
  *
  * 输出: 源文件名同名的 <file>.part1..N 分片文件，并在 stdout 打印
- *       { file, size, parts, chunkSize, sha256 } 元数据（复制到 lib/installer.ts）。
+ *       { file, size, parts, chunkSize, sha256 } 元数据；--emit 同时写入指定文件。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,9 +25,26 @@ function parseSize(input) {
   return Math.floor(value * mult);
 }
 
-const [srcArg, outArg, sizeArg] = process.argv.slice(2);
+let srcArg;
+let outArg;
+let sizeArg;
+let emitPath;
+for (const arg of process.argv.slice(2)) {
+  if (arg === '--emit') continue;
+  if (emitPath === undefined && arg.startsWith('--emit=')) {
+    emitPath = arg.slice('--emit='.length);
+  } else if (emitPath === undefined && process.argv[process.argv.indexOf(arg) - 1] === '--emit') {
+    emitPath = arg;
+  } else if (!srcArg) {
+    srcArg = arg;
+  } else if (!outArg) {
+    outArg = arg;
+  } else if (!sizeArg) {
+    sizeArg = arg;
+  }
+}
 if (!srcArg) {
-  console.error('用法: node scripts/split-installer.mjs <源文件> [输出目录] [分片大小]');
+  console.error('用法: node scripts/split-installer.mjs <源文件> [输出目录] [分片大小] [--emit <元数据文件>]');
   process.exit(1);
 }
 
@@ -66,17 +84,17 @@ const sha256 = crypto
   .update(fs.readFileSync(src))
   .digest('hex');
 
-console.log(
-  JSON.stringify(
-    {
-      file: name,
-      size: total,
-      parts,
-      chunkSize,
-      sha256,
-    },
-    null,
-    2
-  )
-);
+const meta = {
+  file: name,
+  size: total,
+  parts,
+  chunkSize,
+  sha256,
+};
+
+console.log(JSON.stringify(meta, null, 2));
 console.log(`分片输出目录: ${outDir}`);
+
+if (emitPath) {
+  fs.writeFileSync(emitPath, JSON.stringify(meta, null, 2) + '\n', 'utf8');
+}
