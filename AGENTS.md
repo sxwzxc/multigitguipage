@@ -8,8 +8,9 @@
 该 workflow 只更新代码与分片，**直链服务器（multigit.shenxw.cn）上的安装包与 index.html 仍需
 通过 FTP 另行同步**（见下）。
 
-另有 `Copy release assets from MultiGitGui`（手动触发）：把最新 Release 的非源码产物（文档等，
-跳过 exe 与 >20MiB 文件）归档到 `public/release-assets/<tag>/`，成功后自动触发
+另有 `Forward MultiGitGui release to this repo`（手动触发）：把 private 仓库
+`sxwzxc/MultiGitGui` 的最新 Release **转发发布到本仓库（public）的 GitHub Release**
+（下载全部资产后上传到同名 tag 的 Release，body 一并转发），成功后自动触发
 `Update installer from MultiGitGui release`。
 
 以下为本地手动流程（workflow 不可用或需要手工干预时执行）：

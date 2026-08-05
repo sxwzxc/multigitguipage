@@ -1,17 +1,15 @@
-name: Copy release assets from MultiGitGui
+name: Forward MultiGitGui release to this repo
 
-# 手动触发：从 sxwzxc/MultiGitGui 最新 Release 复制非源码产物（文档、说明、各类安装包等，
-# 排除源码包与 MultiGitGui-Setup-*.exe——后者由 Update installer workflow 分片处理）
-# 到本仓库 public/release-assets/<tag>/ 归档；成功后自动触发 Update installer 工作流。
-#
-# 注意：单文件超过 20MiB 的资产会被跳过（EdgeOne Pages 单文件限制 25MiB），
-# 避免破坏静态部署。
+# 手动触发：把 sxwzxc/MultiGitGui（private）的最新 Release 转发发布到
+# 本仓库（public）的 GitHub Release——下载全部资产（含安装包）后上传到
+# 本仓库同名 tag 的 Release，body 一并转发；成功后自动触发
+# Update installer from MultiGitGui release 工作流（分片 + 直链更新）。
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'MultiGitGui release tag to fetch (default: latest)'
+        description: 'MultiGitGui release tag to forward (default: latest)'
         required: false
         type: string
 
@@ -20,13 +18,11 @@ permissions:
   actions: write
 
 jobs:
-  copy:
+  forward:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Resolve release assets
-        id: release
+      - name: Resolve source release
+        id: source
         env:
           GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
           TAG: ${{ inputs.tag }}
@@ -40,58 +36,87 @@ jobs:
           json="$(curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/vnd.github+json" "${api}")"
           tag="$(printf '%s' "$json" | jq -r .tag_name)"
           if [ -z "$tag" ] || [ "$tag" = "null" ]; then
-            echo "::error::Release not found"
+            echo "::error::Source release not found"
             exit 1
           fi
           printf '%s' "$json" | jq -r '.assets[] | [.name, .url] | @tsv' > /tmp/assets.tsv
+          printf '%s' "$json" | jq -r .body > /tmp/release-body.md
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
-          echo "Resolved release: ${tag}, assets: $(wc -l < /tmp/assets.tsv)"
+          echo "Resolved source release: ${tag}, assets: $(wc -l < /tmp/assets.tsv)"
 
-      - name: Download assets
+      - name: Get or create target release
+        id: target
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="${{ steps.source.outputs.tag }}"
+          api="https://api.github.com/repos/sxwzxc/multigitguipage/releases/tags/${tag}"
+          code="$(curl -s -o /tmp/target.json -w '%{http_code}' -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "${api}")"
+          if [ "$code" = "404" ]; then
+            body="Auto-forwarded from the MultiGitGui release (private repo).
+
+$(cat /tmp/release-body.md)"
+            payload="$(jq -n --arg tag "$tag" --arg name "MultiGitGui $tag" --arg body "$body" '{tag_name:$tag,name:$name,body:$body}')"
+            curl -fsSL -X POST \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -d "$payload" \
+              "https://api.github.com/repos/sxwzxc/multigitguipage/releases" > /tmp/target.json
+            echo "Created new release ${tag}"
+          else
+            echo "Release ${tag} already exists, reusing it"
+          fi
+          id="$(jq -r .id /tmp/target.json)"
+          upload_base="$(jq -r .upload_url /tmp/target.json | sed 's/{?name,label}//')"
+          echo "id=${id}" >> "$GITHUB_OUTPUT"
+          echo "upload_base=${upload_base}" >> "$GITHUB_OUTPUT"
+          jq -r '.assets[] | [.name, .id] | @tsv' /tmp/target.json > /tmp/existing-assets.tsv
+
+      - name: Forward assets
         env:
           GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          dir="public/release-assets/${{ steps.release.outputs.tag }}"
-          mkdir -p "$dir"
+          upload_base="${{ steps.target.outputs.upload_base }}"
+          mkdir -p /tmp/assets-dl
           while IFS=$'\t' read -r name url; do
             name="$(basename -- "$name")"
-            if [[ "$name" == MultiGitGui-Setup-*.exe ]]; then
-              echo "skip installer (handled by Update installer workflow): ${name}"
-              continue
-            fi
-            curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/octet-stream" \
-              -o "${dir}/${name}" "${url}"
-            size="$(stat -c%s "${dir}/${name}")"
-            if (( size > 20971520 )); then
-              echo "::warning::${name} is ${size} bytes (> 20MiB), skipped to stay under EdgeOne 25MiB limit"
-              rm -f "${dir}/${name}"
-            else
-              echo "copied: ${name} (${size} bytes)"
-            fi
-          done < /tmp/assets.tsv
-          ls -lh "${dir}"
+            local_path="/tmp/assets-dl/${name}"
 
-      - name: Commit and push
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          tag="${{ steps.release.outputs.tag }}"
-          git add public/release-assets
-          if git diff --cached --quiet; then
-            echo "No new assets to commit"
-          else
-            git commit -m "chore: sync release assets from MultiGitGui ${tag}"
-            git push
-          fi
+            # 目标 release 已有同名资产则先删除，保持最新
+            if [ -f /tmp/existing-assets.tsv ]; then
+              asset_id="$(awk -F '\t' -v n="$name" '$1 == n { print $2; exit }' /tmp/existing-assets.tsv)"
+              if [ -n "$asset_id" ]; then
+                curl -fsSL -X DELETE -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+                  "https://api.github.com/repos/sxwzxc/multigitguipage/releases/assets/${asset_id}"
+                echo "removed stale asset: ${name}"
+              fi
+            fi
+
+            # 从 private 仓库下载
+            curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/octet-stream" \
+              -o "${local_path}" "${url}"
+
+            # 上传到 public 仓库 release
+            qname="$(jq -rn --arg v "$name" '$v|@uri')"
+            curl -fsSL -X POST \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -F "file=@${local_path};filename=${name}" \
+              "${upload_base}?name=${qname}" > /tmp/upload-resp.json
+            size="$(stat -c%s "${local_path}")"
+            echo "forwarded: ${name} (${size} bytes)"
+            rm -f "${local_path}"
+          done < /tmp/assets.tsv
 
       - name: Trigger installer update workflow
         env:
-          GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           curl -fsSL -X POST \
-            -H "Authorization: Bearer ${GH_API_TOKEN}" \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -d '{"ref":"main"}' \
             "https://api.github.com/repos/sxwzxc/multigitguipage/actions/workflows/update-installer.yml/dispatches"
