@@ -4,11 +4,9 @@
 // 写入 EdgeOne Makers Blob(store: records),key 形如 <type>/<date>/<ts>-<uuid>。
 // 首次调用 getStore 时平台自动创建命名空间,无需控制台操作。
 //
-// IP / 地理位置获取:
-// - 优先 Edge Functions 内置 request.eo:eo.clientIp 为真实客户端 IP,
-//   eo.geo 含 countryCodeAlpha2(国家代码)/countryName/regionName/cityName 等,无需控制台配置;
-// - 回退请求头:X-Forwarded-For 第一个值 / EO-Connecting-IP(回源场景),
-//   国家代码回退 EO-Client-IPCountry(规则引擎"客户端 IP 地理位置"操作注入)。
+// IP / 地理位置获取:仅信任 Edge Functions 内置 request.eo
+// (eo.clientIp 为真实客户端 IP;eo.geo 含 countryCodeAlpha2/countryName/
+// regionName/cityName 等),平台注入、客户端不可伪造,无需控制台配置。
 
 import { getStore } from '@edgeone/pages-blob';
 
