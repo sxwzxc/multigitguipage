@@ -9,6 +9,7 @@ interface RecordItem {
   time: string;
   ip: string;
   country?: string;
+  location?: string;
   ua: string;
   path?: string;
   file?: string;
@@ -264,9 +265,18 @@ export default function AdminPage() {
                           {it.ip || '—'}
                         </td>
                         <td className="whitespace-nowrap px-4 py-2.5">
-                          {it.country ? (
-                            <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-700">
-                              {it.country}
+                          {it.country || it.location ? (
+                            <span className="flex items-center gap-1.5">
+                              {it.country && (
+                                <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-700">
+                                  {it.country}
+                                </span>
+                              )}
+                              {it.location && (
+                                <span className="font-mono text-[11px] text-slate-500">
+                                  {truncate(it.location, 40)}
+                                </span>
+                              )}
                             </span>
                           ) : (
                             <span className="text-slate-300">—</span>

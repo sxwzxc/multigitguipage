@@ -1,13 +1,14 @@
 // POST /api/record — 访客 / 下载记录上报
 // body: { type: 'visit' | 'download', path?, file?, channel? }
-// 记录内容:时间、客户端 IP、地理位置（国家/地区）、User-Agent、页面路径 / 下载文件与方式;
+// 记录内容:时间、客户端 IP、地理位置（国家/地区/省份/城市）、User-Agent、页面路径 / 下载文件与方式;
 // 写入 EdgeOne Makers Blob(store: records),key 形如 <type>/<date>/<ts>-<uuid>。
 // 首次调用 getStore 时平台自动创建命名空间,无需控制台操作。
 //
-// IP / 地理位置获取(EdgeOne 官方文档):
-// - 真实 IP:X-Forwarded-For 第一个值(前序代理链路起点)优先,其次 EO-Connecting-IP;
-// - 国家/地区:需在 EdgeOne 控制台 站点加速 → 规则引擎 开启"客户端 IP 地理位置"操作
-//   (匹配条件选 HOST 指向本站域名,自定义头部默认 EO-Client-IPCountry),未配置时为空。
+// IP / 地理位置获取:
+// - 优先 Edge Functions 内置 request.eo:eo.clientIp 为真实客户端 IP,
+//   eo.geo 含 countryCodeAlpha2(国家代码)/countryName/regionName/cityName 等,无需控制台配置;
+// - 回退请求头:X-Forwarded-For 第一个值 / EO-Connecting-IP(回源场景),
+//   国家代码回退 EO-Client-IPCountry(规则引擎"客户端 IP 地理位置"操作注入)。
 
 import { getStore } from '@edgeone/pages-blob';
 
@@ -29,12 +30,13 @@ export async function onRequestPost(context) {
   const key = `${type}/${date}/${now.getTime()}-${crypto.randomUUID()}`;
 
   const ip = clientIp(request);
-  const country = clientCountry(request);
+  const geo = clientGeo(request);
   const record = {
     type: type === 'downloads' ? 'download' : 'visit',
     time: now.toISOString(),
     ip,
-    country,
+    country: geo.country,
+    location: geo.location,
     ua: (request.headers.get('User-Agent') ?? '').slice(0, 512),
     path: clip(payload?.path),
     file: clip(payload?.file),
@@ -43,8 +45,8 @@ export async function onRequestPost(context) {
 
   const store = getStore(STORE);
   await store.setJSON(key, record);
-  // 响应回显 IP/国家,便于上报方自检与调试
-  return json({ ok: true, ip, country });
+  // 响应回显 IP/位置,便于上报方自检与调试
+  return json({ ok: true, ip, country: geo.country, location: geo.location });
 }
 
 /** 字符串字段截断,非字符串则置空 */
@@ -53,10 +55,12 @@ function clip(v) {
 }
 
 /**
- * 真实客户端 IP:EdgeOne 回源默认携带 X-Forwarded-For(取第一个 IP),
- * EO-Connecting-IP 为与 EdgeOne 建连的客户端 IP;其余头部作兼容回退。
+ * 客户端真实 IP:优先 request.eo.clientIp(Edge Functions 内置,EdgeOne 与客户端建连 IP),
+ * 回退 X-Forwarded-For 第一个值 / EO-Connecting-IP 等请求头。
  */
 function clientIp(request) {
+  const eoIp = request.eo?.clientIp;
+  if (typeof eoIp === 'string' && eoIp) return eoIp.slice(0, 64);
   const fwd = request.headers.get('X-Forwarded-For') ?? '';
   return (
     fwd.split(',')[0].trim() ||
@@ -68,17 +72,27 @@ function clientIp(request) {
 }
 
 /**
- * 客户端地理位置(ISO 3166-1 alpha-2 国家/地区代码)。
- * 依赖规则引擎"客户端 IP 地理位置"操作注入,默认头部名 EO-Client-IPCountry;
- * 同时兼容常见自定义命名。
+ * 客户端地理位置:优先 request.eo.geo(内置,含国家代码/国家名/省份/城市),
+ * 回退规则引擎注入的 EO-Client-IPCountry 请求头(ISO 3166-1 alpha-2)。
  */
-function clientCountry(request) {
-  return (
+function clientGeo(request) {
+  const g = request.eo?.geo;
+  if (g) {
+    const country = typeof g.countryCodeAlpha2 === 'string' ? g.countryCodeAlpha2 : '';
+    const parts = [g.countryName, g.regionName, g.cityName].filter(
+      (v) => typeof v === 'string' && v
+    );
+    return {
+      country: country.slice(0, 8),
+      location: parts.join(' · ').slice(0, 128),
+    };
+  }
+  const headerCountry =
     request.headers.get('EO-Client-IPCountry') ||
     request.headers.get('EO-Client-IP-Country') ||
     request.headers.get('X-Client-IP-Country') ||
-    ''
-  ).slice(0, 8);
+    '';
+  return { country: headerCountry.slice(0, 8), location: '' };
 }
 
 function json(data, status = 200) {
