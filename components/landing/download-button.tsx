@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { windowsInstaller } from '@/lib/installer';
+import { reportRecord } from '@/lib/record';
 import type { Translation } from '@/lib/locales/zh';
 
 interface Props {
@@ -90,6 +91,7 @@ export default function DownloadButton({ t }: Props) {
   }
 
   async function handleDownload() {
+    reportRecord({ type: 'download', file, channel: 'shards' });
     setOpen(true);
     setPhase('downloading');
     setPercent(0);

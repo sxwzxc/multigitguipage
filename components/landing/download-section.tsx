@@ -4,6 +4,7 @@ import { Monitor, Laptop, Terminal, Download, Github } from 'lucide-react';
 import DownloadButton from '@/components/landing/download-button';
 import ChangelogDialog from '@/components/landing/changelog-dialog';
 import { windowsInstaller } from '@/lib/installer';
+import { reportRecord } from '@/lib/record';
 import type { Translation } from '@/lib/locales/zh';
 
 interface Props {
@@ -80,6 +81,9 @@ export default function DownloadSection({ t }: Props) {
                 {isWindows ? (
                   <a
                     href={windowsInstaller.directUrl}
+                    onClick={() =>
+                      reportRecord({ type: 'download', file: windowsInstaller.file, channel: 'direct' })
+                    }
                     className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-bold text-white shadow-xl shadow-cyan-600/30 transition-all hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-cyan-600/40"
                   >
                     <Download className="h-4 w-4" />

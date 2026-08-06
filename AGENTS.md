@@ -92,3 +92,15 @@
 - 软件不开源：不得在页面/README 中出现"开源 / MIT / open source"等表述。
 - 安装包主下载走 CDN 直链（`directUrl`），备用下载走分片合并（前端弹窗）。
 - 严禁将服务器凭据、密码、密钥提交到仓库；凭据一律以会话变量方式提供。
+
+## 访问与下载记录（Edge Functions + Blob）
+
+- 记录功能：页面每次加载上报访客记录；主下载（直链）/备用下载（分片）点击各上报一条下载记录。
+  上报端点 `POST /api/record`（公开）；查询端点 `GET /api/records`（需 `X-Admin-Key` 请求头）。
+- 存储：EdgeOne Makers **Blob**，store 名 `records`，首次上报自动创建（免费版 1GB），无需控制台开通。
+  key 形如 `visits/<日期>/<时间戳>-<随机>` / `downloads/<日期>/…`。
+- **鉴权**：`ADMIN_KEY` 配置在 EdgeOne Makers 控制台 → 项目 → 环境变量（函数内 `context.env.ADMIN_KEY` 读取，
+  **绝不写入前端代码或仓库**）；admin 页 `/admin` 输入密码后密码只存浏览器 sessionStorage。
+- 函数代码在 `edge-functions/` 目录（路由 = 文件路径，如 `edge-functions/api/record.js` → `/api/record`），
+  随仓库部署自动生效；静态资源优先级高于函数路由。
+- 记录为公开上报点，未做防刷；若被滥用需在函数侧加频控/校验。

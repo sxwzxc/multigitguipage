@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { zh } from '@/lib/locales/zh';
+import VisitTracker from '@/components/landing/visit-tracker';
 
 export const metadata: Metadata = {
   title: {
@@ -29,7 +30,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <VisitTracker />
+        {children}
+      </body>
     </html>
   );
 }

@@ -33,6 +33,7 @@ lib/locales/         # 中英文文案字典
 public/              # Logo、favicon 与安装包
 public/downloads/    # 安装包（随仓库托管，部署后可直接下载）
 public/api/          # 更新检测/获取 API 端点（由 scripts/bump-version.mjs 发布时生成）
+edge-functions/      # EdgeOne Makers 边缘函数（记录上报/查询 API）
 CHANGELOG.md         # 版本更新日志（由 scripts/bump-version.mjs 从 Release 入库）
 ```
 
@@ -96,6 +97,22 @@ CHANGELOG.md         # 版本更新日志（由 scripts/bump-version.mjs 从 Rel
 - 页面下载区的「更新日志」弹窗即通过 `latest.json → changelogUrl` 拉取并渲染。
 - **不要手改 `public/api/` 下的文件**：它们由 `scripts/bump-version.mjs` 幂等生成（同版本段落替换、
   置顶插入、孤儿版本文件自动清理），下次运行会覆盖。
+
+## 访问与下载记录
+
+页面在**每次加载**时静默上报一条访客记录，Windows 主下载（直链）与备用下载（分片）点击时各上报一条下载记录；
+记录内容为**时间、IP、浏览器（User-Agent）**，以及页面路径 / 下载文件与方式（`direct` 直链 / `shards` 分片）。
+
+- **存储**：EdgeOne Makers **Blob**（`@edgeone/pages-blob` SDK）。`/api/record` 首次调用时自动创建 `records`
+  命名空间（免费版 1GB），key 形如 `visits/<日期>/<时间戳>-<随机>` 与 `downloads/<日期>/…`，无需控制台开通。
+- **记录 API**（Edge Functions，`edge-functions/` 目录，随仓库自动部署）：
+  - `POST /api/record` — 上报记录（body：`{ type: 'visit'|'download', path?, file?, channel? }`），公开无鉴权
+  - `GET /api/records?type=visit|download&cursor=&limit=` — 管理端查询，请求头 `X-Admin-Key` 必须与
+    **环境变量 `ADMIN_KEY`** 一致（在 EdgeOne Makers 控制台 → 项目 → 环境变量中配置），返回
+    `{ items, cursor, total }`（按时间倒序、游标分页，每页默认 50、上限 200）
+- **管理页面**：`https://multigit.sxwzxc.cn/admin` — 输入 `ADMIN_KEY` 登录（密码只存于浏览器
+  `sessionStorage`，不进入前端代码），「访客记录」「下载记录」两个标签页分开展示，「加载更多」分页。
+- 记录为公开上报点，未做防刷；数据量受 Blob 免费额度（1GB）约束。
 
 ## 维护提示
 
