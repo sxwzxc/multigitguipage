@@ -9,6 +9,8 @@ import { reportRecord } from '@/lib/record';
  */
 export default function VisitTracker() {
   useEffect(() => {
+    // /admin 管理页自身的访问不计入访客记录
+    if (window.location.pathname.startsWith('/admin')) return;
     reportRecord({ type: 'visit', path: window.location.pathname });
   }, []);
   return null;

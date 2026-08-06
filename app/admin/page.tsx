@@ -106,26 +106,36 @@ export default function AdminPage() {
     setTotal(0);
     setLoadError('');
     setLoading(true);
-    const data = await fetchRecords(type, null, key);
-    if (data) {
-      setItems(data.items);
-      setCursor(data.cursor);
-      setTotal(data.total);
+    try {
+      const data = await fetchRecords(type, null, key);
+      if (data) {
+        setItems(data.items);
+        setCursor(data.cursor);
+        setTotal(data.total);
+      }
+    } catch {
+      setLoadError('网络错误,请重试');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function loadMore() {
     if (!key || !cursor || loading) return;
     setLoading(true);
     setLoadError('');
-    const data = await fetchRecords(tab, cursor, key);
-    if (data) {
-      setItems((prev) => [...prev, ...data.items]);
-      setCursor(data.cursor);
-      setTotal(data.total);
+    try {
+      const data = await fetchRecords(tab, cursor, key);
+      if (data) {
+        setItems((prev) => [...prev, ...data.items]);
+        setCursor(data.cursor);
+        setTotal(data.total);
+      }
+    } catch {
+      setLoadError('网络错误,请重试');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (

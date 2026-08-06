@@ -14,7 +14,8 @@ export async function onRequestGet(context) {
     return json({ error: 'ADMIN_KEY not configured' }, 500);
   }
   const url = new URL(request.url);
-  const provided = request.headers.get('X-Admin-Key') || url.searchParams.get('key') || '';
+  // 仅接受请求头传递密钥,避免密钥进入 URL(访问日志/浏览器历史/Referer 泄露面)
+  const provided = request.headers.get('X-Admin-Key') ?? '';
   if (provided !== adminKey) {
     return json({ error: 'unauthorized' }, 401);
   }
