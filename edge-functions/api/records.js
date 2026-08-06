@@ -26,7 +26,7 @@ export async function onRequestGet(context) {
   }
 
   const type = TYPE_PREFIX[url.searchParams.get('type')] ?? 'visits';
-  const limit = Math.min(Number(url.searchParams.get('limit')) || 50, 200);
+  const limit = Math.max(1, Math.min(Number(url.searchParams.get('limit')) || 50, 200));
   const cursor = url.searchParams.get('cursor');
 
   const store = getStore(STORE);

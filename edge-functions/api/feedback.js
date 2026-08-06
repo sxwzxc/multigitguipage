@@ -11,6 +11,11 @@ const STORE = 'records';
 
 export async function onRequestPost(context) {
   const { request } = context;
+  // 拒绝超大请求体(反馈字段总长有限,正常 body 远小于此)
+  const contentLength = Number(request.headers.get('Content-Length')) || 0;
+  if (contentLength > 100 * 1024) {
+    return json({ ok: false, error: 'payload too large' }, 413);
+  }
   let payload = {};
   try {
     payload = await request.json();
@@ -61,41 +66,26 @@ function clip(v, max) {
 }
 
 /**
- * 客户端真实 IP:优先 request.eo.clientIp(Edge Functions 内置),
- * 回退 X-Forwarded-For 第一个值 / EO-Connecting-IP 等请求头。
+ * 客户端真实 IP:仅信任 Edge Functions 内置 request.eo.clientIp(平台注入,不可伪造);
+ * 不使用 X-Forwarded-For 等客户端可控请求头,避免 IP/位置被伪造污染后台数据。
  */
 function clientIp(request) {
   const eoIp = request.eo?.clientIp;
-  if (typeof eoIp === 'string' && eoIp) return eoIp.slice(0, 64);
-  const fwd = request.headers.get('X-Forwarded-For') ?? '';
-  return (
-    fwd.split(',')[0].trim() ||
-    request.headers.get('EO-Connecting-IP') ||
-    request.headers.get('CF-Connecting-IP') ||
-    request.headers.get('True-Client-IP') ||
-    ''
-  ).slice(0, 64);
+  return typeof eoIp === 'string' ? eoIp.slice(0, 64) : '';
 }
 
-/** 客户端地理位置:优先 request.eo.geo,回退规则引擎注入的 EO-Client-IPCountry */
+/** 客户端地理位置:仅信任 request.eo.geo(平台注入,不可伪造) */
 function clientGeo(request) {
   const g = request.eo?.geo;
-  if (g) {
-    const country = typeof g.countryCodeAlpha2 === 'string' ? g.countryCodeAlpha2 : '';
-    const parts = [g.countryName, g.regionName, g.cityName].filter(
-      (v) => typeof v === 'string' && v
-    );
-    return {
-      country: country.slice(0, 8),
-      location: parts.join(' · ').slice(0, 128),
-    };
-  }
-  const headerCountry =
-    request.headers.get('EO-Client-IPCountry') ||
-    request.headers.get('EO-Client-IP-Country') ||
-    request.headers.get('X-Client-IP-Country') ||
-    '';
-  return { country: headerCountry.slice(0, 8), location: '' };
+  if (!g) return { country: '', location: '' };
+  const country = typeof g.countryCodeAlpha2 === 'string' ? g.countryCodeAlpha2 : '';
+  const parts = [g.countryName, g.regionName, g.cityName].filter(
+    (v) => typeof v === 'string' && v
+  );
+  return {
+    country: country.slice(0, 8),
+    location: parts.join(' · ').slice(0, 128),
+  };
 }
 
 function json(data, status = 200) {
