@@ -92,9 +92,9 @@ export interface Translation {
 export const zh: Translation = {
   lang: 'zh',
   meta: {
-    title: 'MultiGitGui — 一个项目，同时管理所有仓库',
+    title: 'MultiGitGui — 一个软件，同时管理所有仓库',
     description:
-      '面向跨仓库工作流的跨平台 Git 桌面客户端。基于 .NET 10 与 Avalonia，支持 Windows、macOS 与 Linux。',
+      '面向一个项目同时包含多个仓库的开发者。支持 Windows、macOS 与 Linux。',
   },
   nav: {
     features: '特性',
@@ -104,10 +104,10 @@ export const zh: Translation = {
   },
   hero: {
     badge: 'v1.3.22 · 跨平台 · 免费',
-    title1: '一个项目，',
+    title1: '一个软件，',
     title2: '同时管理所有仓库',
     subtitle:
-      'MultiGitGui 是一款为多仓库工作流而生的跨平台 Git 桌面客户端。把一项工作涉及的所有仓库编成一个项目，fetch、pull、push、切换分支、reset、stash 全部以项目为单位批量执行，同时尊重每个仓库自己的分支与状态。',
+      'MultiGitGui 是一款为单项目存在多仓库管理而生的跨平台 Git 桌面客户端。把一项工作涉及的所有仓库编成一个项目，fetch、pull、push、切换分支、reset、stash 全部以项目为单位批量执行，同时尊重每个仓库自己的分支与状态。',
     ctaDownload: '下载 MultiGitGui',
     ctaFeatures: '了解特性',
     platformNote: 'Windows 10+ · macOS 12+ · Linux x64 / arm64',
@@ -125,45 +125,49 @@ export const zh: Translation = {
     conflict: '冲突',
   },
   features: {
-    title: '为真实的多仓工作流设计',
+    title: '为单项目包含多代码库设计',
     subtitle:
       '大多数 Git GUI 围绕单个仓库设计。MultiGitGui 面向的是一项工作横跨多个仓库的场景——所有操作以项目为单位，每个仓库仍保持独立。',
     items: [
       {
-        title: '项目 → 仓库',
-        desc: '逐个添加仓库、扫描文件夹树或批量克隆。单个仓库可单独排除在批量操作之外。',
+        title: '快速定位改动',
+        desc: '代码都是AI写，AI改完代码，自己连AI改了哪些代码库都不知道？跨仓查看未提交改动，让你在一个页面就能快速定位。',
       },
       {
-        title: '尊重每个仓库的批量操作',
-        desc: 'push 使用各仓库自己的分支与 upstream；checkout 会先逐仓预检，明确告知哪些会切换、哪些会跟踪、哪些必须跳过。',
+        title: '一键清理代码库',
+        desc: '拉取新代码后编译不通过？使用一键清理代码库功能，一键把项目重置到最新代码，并可选清理本地所有缓存。',
+      },
+      {
+        title: '一键批量推送',
+        desc: 'AI改代码、AI做提交，但AI推送总是遇到问题？手动推送又经常漏推送某个库导致编译失败？MultiGitGui提供了按项目推送所有代码库的功能。',
       },
       {
         title: 'Gerrit 评审推送',
-        desc: 'refs/for/<branch> 按仓库推导或统一指定，topic、reviewer、WIP、private 等作为独立的 -o 参数传递。',
+        desc: '受够了每次推送前手动添加refs/for/前缀？MultiGitGui支持一键推送到Gerrit平台，topic、reviewer、WIP、private 等作为独立的 -o 参数传递。',
       },
       {
-        title: '聚合视图',
-        desc: 'Overview 表格逐仓显示分支与 ahead/behind；Changes 合并全部工作区改动；History 按提交时间归并所有仓库的提交。',
+        title: '快速Bash终端',
+        desc: '多个代码库需要CP提交，还在一个文件夹一个文件夹的右键Git Bash再右键粘贴？MultiGitGui支持快速切换仓库后ctrl+v粘贴终端命令，一键执行。',
       },
       {
-        title: '完整的单仓工作流',
-        desc: '文件级、hunk 级与行级暂存，commit、amend、冲突解决，分支/标签/远端/stash/子模块管理，并排 diff 与可追溯的 blame。',
+        title: '归一化Git Log',
+        desc: '拉取代码后编译失败，还在对每个代码库右键日志找害虫提交？聚合的历史视图，让你在一个页面就能按时间倒序所有改动。',
       },
       {
-        title: '跨仓搜索与命令面板',
-        desc: '搜索提交说明、作者、SHA、文件内容与文件名；命令面板与 Ctrl+1…Ctrl+7 让常用操作全部可用键盘完成。',
+        title: '一键切换分支',
+        desc: '又有bug需要切分支修？MultiGitGui支持一键切换当前项目所有代码库的分支。',
       },
       {
-        title: '有预览的历史操作',
-        desc: 'Merge 与 Rebase 执行前先显示逐仓计划；交互式变基支持重排与 pick/reword/edit/squash/fixup/drop。',
+        title: '稳定的blame、history',
+        desc: '某些代码库层级太深，部分Git GUI右键文件无法blame或查看日志？MultiGitGui针对性优化相关功能，让你在软件类就能享受稳定的blame、history功能。。',
       },
       {
-        title: '数据与 Git 均可移植',
-        desc: '设置、工作区、日志、缓存、备份都有独立路径，迁移前先预览；Git 可执行文件与环境变量全部可配置。',
+        title: '现代化的UI界面',
+        desc: 'MultiGitGui支持现代化的UI界面，支持暗色、浅色、半透明、毛玻璃多种外观组合，不用再忍受刺眼的RGB配色。',
       },
       {
-        title: '可审计的输出面板',
-        desc: '每次 Git 调用记录脱敏后的命令行、退出码与输出。URL 凭据、token 与认证 header 永不进入日志或界面。',
+        title: '原生应用开发',
+        desc: '不用再忍受Web化的痛苦，坚持原生开发，提升性能节省内存的同时，依然可以保证完全免费。',
       },
     ],
   },
@@ -191,7 +195,7 @@ export const zh: Translation = {
     close: '关闭',
     speed: '速度',
     eta: '预计剩余',
-    gitReq: '需要 Git 2.30 或更新版本（MultiGitGui 不内置 Git，驱动你选定的 Git，因此 credential helper、hooks 与 SSH 配置继续生效）。',
+    gitReq: '建议 Git 2.30 或更新版本（MultiGitGui 不内置 Git，驱动你选定的 Git，因此 credential helper、hooks 与 SSH 配置继续生效）。',
     windows: {
       name: 'Windows',
       file: 'MultiGitGui-Setup-1.3.22.exe',
@@ -224,8 +228,8 @@ export const zh: Translation = {
         a: '完全免费，无需付费即可使用全部功能。',
       },
       {
-        q: '支持中文界面吗？',
-        a: '支持。界面在运行时即可在简体中文与英文之间切换，并支持浅色、深色与跟随系统三种主题。',
+        q: '我的C盘权限受限可以使用吗？',
+        a: '针对权限受限场景单独优化，几乎所有数据、配置都可以手动指定位置。',
       },
       {
         q: '数据存放在哪里？',
