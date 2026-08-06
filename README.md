@@ -115,8 +115,29 @@ CHANGELOG.md         # 版本更新日志（由 scripts/bump-version.mjs 从 Rel
     **环境变量 `ADMIN_KEY`** 一致（在 EdgeOne Makers 控制台 → 项目 → 环境变量中配置），返回
     `{ items, cursor, total }`（按时间倒序、游标分页，每页默认 50、上限 200）
 - **管理页面**：`https://multigit.sxwzxc.cn/admin` — 输入 `ADMIN_KEY` 登录（密码只存于浏览器
-  `sessionStorage`，不进入前端代码），「访客记录」「下载记录」两个标签页分开展示，「加载更多」分页。
+  `sessionStorage`，不进入前端代码），「访客记录」「下载记录」「意见反馈」三个标签页分开展示，「加载更多」分页。
 - 记录为公开上报点，未做防刷；数据量受 Blob 免费额度（1GB）约束。
+
+## 意见反馈
+
+页面 Footer「意见反馈」按钮弹出表单（昵称/联系方式/系统/反馈内容/其他），也可直接调用接口：
+
+- `POST /api/feedback` — 提交反馈（公开）。请求 JSON：
+
+  ```json
+  {
+    "nickname": "昵称（选填，≤64）",
+    "contact": "联系方式（选填，≤128）",
+    "os": "系统信息（选填，≤128）",
+    "content": "反馈内容（必填，≤2000）",
+    "extra": "其他（选填，≤512）"
+  }
+  ```
+
+  服务端自动注入 `time`（ISO 时间）、`ip`、`country`、`location`、`ua`，存储 key 为
+  `feedbacks/<日期>/<时间戳>-<uuid>`；`content` 为空或非法 JSON 返回 400，成功返回
+  `{ ok, time, ip, country, location }`。
+- 查看：admin 页「意见反馈」标签页（`GET /api/records?type=feedback`，需 `X-Admin-Key`），卡片式列表展示。
 
 ## 维护提示
 

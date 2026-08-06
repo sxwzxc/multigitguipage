@@ -1,10 +1,15 @@
-// GET /api/records?type=visit|download&cursor=&limit= — 管理端查询访客/下载记录
-// 鉴权:请求头 X-Admin-Key(或 ?key=)必须与环境变量 ADMIN_KEY 一致,否则 401。
+// GET /api/records?type=visit|download|feedback&cursor=&limit= — 管理端查询访客/下载/反馈记录
+// 鉴权:请求头 X-Admin-Key 必须与环境变量 ADMIN_KEY 一致,否则 401。
 // 从 Blob(store: records)按前缀列出,key 倒序(最新在前),游标分页。
 
 import { getStore } from '@edgeone/pages-blob';
 
 const STORE = 'records';
+const TYPE_PREFIX = {
+  visit: 'visits',
+  download: 'downloads',
+  feedback: 'feedbacks',
+};
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -20,7 +25,7 @@ export async function onRequestGet(context) {
     return json({ error: 'unauthorized' }, 401);
   }
 
-  const type = url.searchParams.get('type') === 'download' ? 'downloads' : 'visits';
+  const type = TYPE_PREFIX[url.searchParams.get('type')] ?? 'visits';
   const limit = Math.min(Number(url.searchParams.get('limit')) || 50, 200);
   const cursor = url.searchParams.get('cursor');
 

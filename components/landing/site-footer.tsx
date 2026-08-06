@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { Monitor, Laptop, Terminal } from 'lucide-react';
+import FeedbackDialog from '@/components/landing/feedback-dialog';
 import type { Translation } from '@/lib/locales/zh';
 
 interface Props {
@@ -78,7 +79,10 @@ export default function SiteFooter({ t }: Props) {
           <p className="font-mono text-[11px] text-slate-400">
             {t.footer.copyright.replace('{year}', String(year))}
           </p>
-          <p className="font-mono text-[11px] text-slate-400">.NET 10 · Avalonia · Win / macOS / Linux</p>
+          <div className="flex items-center gap-4">
+            <p className="font-mono text-[11px] text-slate-400">.NET 10 · Avalonia · Win / macOS / Linux</p>
+            <FeedbackDialog t={t} />
+          </div>
         </div>
       </div>
     </footer>

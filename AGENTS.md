@@ -95,8 +95,9 @@
 
 ## 访问与下载记录（Edge Functions + Blob）
 
-- 记录功能：页面每次加载上报访客记录；主下载（直链）/备用下载（分片）点击各上报一条下载记录。
-  上报端点 `POST /api/record`（公开）；查询端点 `GET /api/records`（需 `X-Admin-Key` 请求头）。
+- 记录功能：页面每次加载上报访客记录；主下载（直链）/备用下载（分片）点击各上报一条下载记录；
+  Footer「意见反馈」表单提交反馈。上报端点 `POST /api/record`、`POST /api/feedback`（公开）；
+  查询端点 `GET /api/records?type=visit|download|feedback`（需 `X-Admin-Key` 请求头）。
 - 存储：EdgeOne Makers **Blob**，store 名 `records`，首次上报自动创建（免费版 1GB），无需控制台开通。
   key 形如 `visits/<日期>/<时间戳>-<随机>` / `downloads/<日期>/…`。
 - **IP/位置**：优先 Edge Functions 内置 `request.eo`（`eo.clientIp` 真实 IP、`eo.geo` 国家/省份/城市），

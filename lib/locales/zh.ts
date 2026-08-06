@@ -71,6 +71,22 @@ export interface Translation {
     linux: string;
     copyright: string;
   };
+  feedback: {
+    button: string;
+    title: string;
+    desc: string;
+    nickname: string;
+    contact: string;
+    os: string;
+    content: string;
+    extra: string;
+    optional: string;
+    submit: string;
+    sending: string;
+    success: string;
+    failed: string;
+    contentRequired: string;
+  };
 }
 
 export const zh: Translation = {
@@ -232,5 +248,21 @@ export const zh: Translation = {
     mac: 'macOS 12+',
     linux: 'Linux x64 / arm64',
     copyright: '© {year} sxw. 保留所有权利。',
+  },
+  feedback: {
+    button: '意见反馈',
+    title: '意见反馈',
+    desc: '遇到问题或有建议?告诉我们,我们会认真阅读每一条反馈。',
+    nickname: '昵称',
+    contact: '联系方式',
+    os: '系统信息',
+    content: '反馈内容',
+    extra: '其他补充',
+    optional: '选填',
+    submit: '提交反馈',
+    sending: '提交中…',
+    success: '感谢你的反馈!',
+    failed: '提交失败,请稍后重试',
+    contentRequired: '请填写反馈内容',
   },
 };

@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState, type FormEvent } from 'react';
-import { Loader2, Lock, Users, Download, KeyRound } from 'lucide-react';
+import { Loader2, Lock, Users, Download, MessageSquare, KeyRound } from 'lucide-react';
 
 interface RecordItem {
   key: string;
-  type: 'visit' | 'download';
+  type: 'visit' | 'download' | 'feedback';
   time: string;
   ip: string;
   country?: string;
@@ -14,7 +14,14 @@ interface RecordItem {
   path?: string;
   file?: string;
   channel?: string;
+  nickname?: string;
+  contact?: string;
+  os?: string;
+  content?: string;
+  extra?: string;
 }
+
+type RecordType = 'visit' | 'download' | 'feedback';
 
 interface RecordsResponse {
   items: RecordItem[];
@@ -39,7 +46,7 @@ export default function AdminPage() {
   const [key, setKey] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
   const [authError, setAuthError] = useState('');
-  const [tab, setTab] = useState<'visit' | 'download'>('visit');
+  const [tab, setTab] = useState<RecordType>('visit');
   const [items, setItems] = useState<RecordItem[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [total, setTotal] = useState(0);
@@ -56,7 +63,7 @@ export default function AdminPage() {
   }, []);
 
   async function fetchRecords(
-    type: 'visit' | 'download',
+    type: RecordType,
     c: string | null,
     k: string
   ): Promise<RecordsResponse | null> {
@@ -100,7 +107,7 @@ export default function AdminPage() {
     }
   }
 
-  async function switchTab(type: 'visit' | 'download') {
+  async function switchTab(type: RecordType) {
     if (!key) return;
     setTab(type);
     setItems([]);
@@ -232,9 +239,106 @@ export default function AdminPage() {
                 <Download className="h-4 w-4" /> 下载记录
                 <span className="text-xs opacity-80">{tab === 'download' ? total : ''}</span>
               </button>
+              <button
+                type="button"
+                onClick={() => switchTab('feedback')}
+                className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                  tab === 'feedback'
+                    ? 'bg-primary text-white shadow-lg shadow-cyan-600/25'
+                    : 'border border-slate-300 bg-white/70 text-slate-600 hover:text-primary'
+                }`}
+              >
+                <MessageSquare className="h-4 w-4" /> 意见反馈
+                <span className="text-xs opacity-80">{tab === 'feedback' ? total : ''}</span>
+              </button>
             </div>
 
-            {/* 记录表格 */}
+            {/* 意见反馈:卡片列表 */}
+            {tab === 'feedback' ? (
+              <div className="glass-card mt-4 overflow-hidden rounded-2xl">
+                <div className="divide-y divide-slate-100">
+                  {items.map((it) => (
+                    <div key={it.key} className="px-5 py-4">
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-mono text-[11px] text-slate-500">
+                        <span>{fmtTime(it.time)}</span>
+                        <span className="text-slate-800">{it.ip || '—'}</span>
+                        {it.country && (
+                          <span className="rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+                            {it.country}
+                          </span>
+                        )}
+                        {it.location && <span>{truncate(it.location, 40)}</span>}
+                      </div>
+                      {(it.nickname || it.contact || it.os) && (
+                        <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
+                          {it.nickname && (
+                            <span className="rounded-md bg-cyan-500/10 px-2 py-0.5 font-medium text-cyan-700">
+                              昵称：{it.nickname}
+                            </span>
+                          )}
+                          {it.contact && (
+                            <span className="rounded-md bg-violet-500/10 px-2 py-0.5 font-medium text-violet-700">
+                              联系：{it.contact}
+                            </span>
+                          )}
+                          {it.os && (
+                            <span className="rounded-md bg-slate-500/10 px-2 py-0.5 font-medium text-slate-600">
+                              系统：{it.os}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+                        {it.content || '—'}
+                      </p>
+                      {it.extra && (
+                        <p className="mt-1.5 text-xs text-slate-400">其他：{it.extra}</p>
+                      )}
+                      {it.ua && (
+                        <p
+                          className="mt-2 truncate font-mono text-[10px] text-slate-300"
+                          title={it.ua}
+                        >
+                          {it.ua}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                  {!loading && items.length === 0 && (
+                    <p className="px-5 py-12 text-center text-sm text-slate-400">暂无反馈</p>
+                  )}
+                </div>
+                {loadError && (
+                  <p className="border-t border-slate-200/70 px-5 py-2.5 text-xs text-red-500">
+                    {loadError}
+                  </p>
+                )}
+                <div className="flex items-center justify-between border-t border-slate-200/70 bg-white/40 px-5 py-3">
+                  <span className="font-mono text-[11px] text-slate-500">
+                    共 {total} 条 · 每页 {LIMIT} 条
+                  </span>
+                  {cursor ? (
+                    <button
+                      type="button"
+                      onClick={loadMore}
+                      disabled={loading}
+                      className="flex items-center gap-1.5 rounded-full border border-slate-300 bg-white/70 px-4 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:border-cyan-600/40 hover:text-primary disabled:cursor-wait disabled:opacity-60"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" /> 加载中…
+                        </>
+                      ) : (
+                        '加载更多'
+                      )}
+                    </button>
+                  ) : (
+                    <span className="text-xs text-slate-400">已全部加载</span>
+                  )}
+                </div>
+              </div>
+            ) : (
+            /* 访客/下载记录表格 */
             <div className="glass-card mt-4 overflow-hidden rounded-2xl">
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[720px] text-left text-sm">
@@ -353,6 +457,7 @@ export default function AdminPage() {
                 )}
               </div>
             </div>
+            )}
           </div>
         )}
       </div>
