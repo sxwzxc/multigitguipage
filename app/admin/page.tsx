@@ -8,6 +8,7 @@ interface RecordItem {
   type: 'visit' | 'download';
   time: string;
   ip: string;
+  country?: string;
   ua: string;
   path?: string;
   file?: string;
@@ -240,6 +241,7 @@ export default function AdminPage() {
                     <tr className="border-b border-slate-200/70 bg-white/40 font-mono text-[11px] uppercase tracking-[0.12em] text-slate-500">
                       <th className="px-4 py-3">时间</th>
                       <th className="px-4 py-3">IP</th>
+                      <th className="px-4 py-3">位置</th>
                       <th className="px-4 py-3">浏览器 / UA</th>
                       {tab === 'visit' ? (
                         <th className="px-4 py-3">页面</th>
@@ -260,6 +262,15 @@ export default function AdminPage() {
                         </td>
                         <td className="whitespace-nowrap px-4 py-2.5 font-mono text-xs text-slate-800">
                           {it.ip || '—'}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-2.5">
+                          {it.country ? (
+                            <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-700">
+                              {it.country}
+                            </span>
+                          ) : (
+                            <span className="text-slate-300">—</span>
+                          )}
                         </td>
                         <td
                           className="max-w-[260px] truncate px-4 py-2.5 font-mono text-[11px] text-slate-500"
@@ -293,7 +304,7 @@ export default function AdminPage() {
                     ))}
                     {!loading && items.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="px-4 py-12 text-center text-sm text-slate-400">
+                        <td colSpan={6} className="px-4 py-12 text-center text-sm text-slate-400">
                           暂无记录
                         </td>
                       </tr>

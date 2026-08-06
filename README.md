@@ -105,6 +105,10 @@ CHANGELOG.md         # 版本更新日志（由 scripts/bump-version.mjs 从 Rel
 
 - **存储**：EdgeOne Makers **Blob**（`@edgeone/pages-blob` SDK）。`/api/record` 首次调用时自动创建 `records`
   命名空间（免费版 1GB），key 形如 `visits/<日期>/<时间戳>-<随机>` 与 `downloads/<日期>/…`，无需控制台开通。
+- **IP 与地理位置**：真实 IP 取 `X-Forwarded-For` 第一个值（回退 `EO-Connecting-IP`）；
+  国家/地区（`country`，ISO 3166-1 alpha-2）依赖规则引擎「客户端 IP 地理位置」操作注入
+  `EO-Client-IPCountry` 请求头——需在 EdgeOne 控制台 **站点加速 → 规则引擎** 创建规则：
+  匹配条件选 HOST 指向本站域名，操作选「客户端 IP 地理位置头部」并开启（未配置时 country 为空）。
 - **记录 API**（Edge Functions，`edge-functions/` 目录，随仓库自动部署）：
   - `POST /api/record` — 上报记录（body：`{ type: 'visit'|'download', path?, file?, channel? }`），公开无鉴权
   - `GET /api/records?type=visit|download&cursor=&limit=` — 管理端查询，请求头 `X-Admin-Key` 必须与

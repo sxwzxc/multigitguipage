@@ -99,6 +99,8 @@
   上报端点 `POST /api/record`（公开）；查询端点 `GET /api/records`（需 `X-Admin-Key` 请求头）。
 - 存储：EdgeOne Makers **Blob**，store 名 `records`，首次上报自动创建（免费版 1GB），无需控制台开通。
   key 形如 `visits/<日期>/<时间戳>-<随机>` / `downloads/<日期>/…`。
+- **IP/位置**：真实 IP 取 `X-Forwarded-For` 首个值（回退 `EO-Connecting-IP`）；`country`（国家/地区代码）
+  需用户在 EdgeOne 控制台规则引擎开启「客户端 IP 地理位置」头部（默认 `EO-Client-IPCountry`），代码已支持读取。
 - **鉴权**：`ADMIN_KEY` 配置在 EdgeOne Makers 控制台 → 项目 → 环境变量（函数内 `context.env.ADMIN_KEY` 读取，
   **绝不写入前端代码或仓库**）；admin 页 `/admin` 输入密码后密码只存浏览器 sessionStorage。
 - 函数代码在 `edge-functions/` 目录（路由 = 文件路径，如 `edge-functions/api/record.js` → `/api/record`），
