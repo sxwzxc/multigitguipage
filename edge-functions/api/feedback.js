@@ -43,7 +43,7 @@ export async function onRequestPost(context) {
     ua: (request.headers.get('User-Agent') ?? '').slice(0, 512),
     nickname: clip(payload?.nickname, 64),
     contact: clip(payload?.contact, 128),
-    os: clip(payload?.os, 128),
+    os: clip(payload?.os, 256),
     content: content.slice(0, 2000),
     extra: clip(payload?.extra, 512),
   };

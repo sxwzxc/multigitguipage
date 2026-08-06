@@ -128,7 +128,7 @@ CHANGELOG.md         # 版本更新日志（由 scripts/bump-version.mjs 从 Rel
   {
     "nickname": "昵称（选填，≤64）",
     "contact": "联系方式（选填，≤128）",
-    "os": "系统信息（选填，≤128）",
+    "os": "系统信息（选填，≤256）",
     "content": "反馈内容（必填，≤2000）",
     "extra": "其他（选填，≤512）"
   }

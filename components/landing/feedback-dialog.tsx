@@ -146,7 +146,7 @@ export default function FeedbackDialog({ t }: Props) {
                 <input
                   value={os}
                   onChange={(e) => setOs(e.target.value)}
-                  maxLength={128}
+                  maxLength={256}
                   className={inputCls}
                 />
               </label>
