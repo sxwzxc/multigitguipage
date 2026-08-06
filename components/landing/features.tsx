@@ -10,6 +10,7 @@ import {
   Workflow,
   HardDrive,
   ScrollText,
+  Eraser,
   type LucideIcon,
 } from 'lucide-react';
 import type { Translation } from '@/lib/locales/zh';
@@ -28,6 +29,7 @@ const icons: LucideIcon[] = [
   Workflow,
   HardDrive,
   ScrollText,
+  Eraser,
 ];
 
 export default function Features({ t }: Props) {
