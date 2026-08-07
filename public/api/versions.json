@@ -1,6 +1,11 @@
 {
-  "latest": "1.4.4",
+  "latest": "1.5.0",
   "versions": [
+    {
+      "version": "1.5.0",
+      "publishedAt": "2026-08-07",
+      "changelogUrl": "/api/changelog/1.5.0.md"
+    },
     {
       "version": "1.4.4",
       "publishedAt": "2026-08-06",

@@ -2,13 +2,5 @@
   "version": "1.4.4",
   "publishedAt": "2026-08-06",
   "changelogUrl": "/api/changelog/1.4.4.md",
-  "installer": {
-    "version": "1.4.4",
-    "file": "MultiGitGui-Setup-1.4.4.exe",
-    "size": 76176896,
-    "parts": 4,
-    "chunkSize": 20971520,
-    "sha256": "feaad7fda24cbebebb5caff08f75c7475e2ca088f0854c30f5d478b04117288a",
-    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-1.4.4.exe"
-  }
+  "installer": null
 }

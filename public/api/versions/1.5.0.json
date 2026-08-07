@@ -1,0 +1,14 @@
+{
+  "version": "1.5.0",
+  "publishedAt": "2026-08-07",
+  "changelogUrl": "/api/changelog/1.5.0.md",
+  "installer": {
+    "version": "1.5.0",
+    "file": "MultiGitGui-Setup-1.5.0.exe",
+    "size": 76204544,
+    "parts": 4,
+    "chunkSize": 20971520,
+    "sha256": "1526d281fbead990da4d1da3a0ac55266b6707ed6ae34410de55f9efb531b98e",
+    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-1.5.0.exe"
+  }
+}
