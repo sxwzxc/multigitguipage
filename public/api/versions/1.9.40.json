@@ -1,0 +1,14 @@
+{
+  "version": "1.9.40",
+  "publishedAt": "2026-08-13",
+  "changelogUrl": "/api/changelog/1.9.40.md",
+  "installer": {
+    "version": "1.9.40",
+    "file": "MultiGitGui-Setup-1.9.40.exe",
+    "size": 76384768,
+    "parts": 4,
+    "chunkSize": 20971520,
+    "sha256": "1c02f4dbf8f5427103a92af06db3239b6a6bb2780520c2b2bf57b41288a1f758",
+    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-1.9.40.exe"
+  }
+}
