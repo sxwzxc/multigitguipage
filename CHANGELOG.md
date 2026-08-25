@@ -1,3 +1,255 @@
+## 2.1.4 (2026-08-25)
+
+# 2.1.1 - 2026-08-25
+
+## 修复
+
+- 修复：`SettingsStore.Changed` 按字段差分触发主题/字体/玻璃效果，`AutoRefreshHintDismissed`/`SetupWizardCompleted`/布局尺寸/更新时间戳不再触发整窗 chrome；`TransparencyLevelHint` 已为 `Transparent` 时不再重赋值，`Background`/`TransparencyBackgroundFallback` 同理；`UiThread.Post` 统一 marshal，避免后台 `Save` 跨线程碰界面
+- 修复：向导 `AnimationsEnabled` 改为 `!ReduceMotion` 种子（`_animationsEnabled` 默认 `true`，与注释“Both default to on”对齐），首装点“跳过”不再把 `ReduceMotion` 从 `false` 误改 `true`
+- 修复：macOS 主窗 `NSWindow` 透明化（`/usr/lib/libobjc.A.dylib`、`setOpaque:` 复用、`clearColor`/`windowBackgroundColor` 区分常态与最大化），圆角外不再露灰直角；仅经 `ApplyNativeWindowShape → MacWindowChrome.TryApply` 进入；`respondsToSelector:` 守卫并在 handle 已是 `NSWindow` 时不再发送 `window`，避免安装后启动 `objc_exception_throw`/`abort`
+- 修复：从 DMG 安装后进程名显示为「Avalonia Application」——`App.Name`、`ApplicationTitle` 与 `Info.plist` `CFBundleDevelopmentRegion` 对齐为 MultiGitGui
+- 修复：`DiffToolLauncher` 按平台解析 `MultiGitGuiDiff.exe`/`MultiGitGuiDiff`，`PATH` 扫到即返回不再跑 `which`，Unix 不再调用 `where.exe`
+
+## 优化
+
+- 优化：`ShellAppearance` 拆 `EnableVisualEffects`/`ReduceMotion`/`WallpaperPath` 细粒度谓词，仅改动画时不重刷玻璃与壁纸（`ApplyVisualEffects`/`ApplyWallpaper`/`RefreshBackdrop`）
+- 优化：macOS DMG 改为按 `.app` 体积分配 HFS+ UDRW 暂存 → `ditto` 拷入 `.app` → 挂载卷上 `/Applications` 链接 → `osascript` Finder 拖放布局（540×380、128px 图标、隐藏工具栏/状态栏、item 级隐藏扩展名，`build/macos/dmg-background.png` 箭头底图）→ `hdiutil convert` UDZO → **`hdiutil verify`**；`detach` 遇 Resource busy 重试；`.app` 组包与 Diff 拷贝亦用 `ditto`（ADR-0034）
+- 优化：`build/publish.sh` 去掉 `codesign 2>/dev/null` 吞错，`build/publish.sh`/`build/publish.ps1` 补末尾换行；`getExecutableFileName`/`FindOnPath` 抽取便于测试
+- 优化：`build/publish.ps1`/`publish.sh`/`package.ps1` 不再内嵌跑测试，临时打包不再被全量测试拖住；测试改走 `build/run-tests.ps1`/`run-tests.sh`（`-Scope`/`CONFIGURATION`）
+
+## 文档
+
+- 文档：README（中英）发布段改为下载对应 `MultiGitGui-osx-arm64.dmg`/`osx-x64.dmg`、挂载拖入 Applications，保留 ad-hoc 与 Developer ID 说明，注明 Windows 交叉编译仅产开发用 `.app` 无 DMG
+- 文档：README（中英）发布段标明 publish/package 不跑测试，测试走 `build/run-tests.ps1`/`run-tests.sh`
+
+# 2.1.0 - 2026-08-24
+
+## 修复
+
+- 修复：主界面 Diff 长文件可纵向滚完（视口高度不再等于全文高度）
+- 修复：不勾选双栏视图时删除/新增行恢复整行红绿（unified 使用镜像行 Kind）
+- 修复：查看路径历史后，侧栏改选其它仓库或项目会回到对应的普通历史；进入路径历史时侧栏跳到该文件所属仓库
+- 修复：独立 Diff 对工作区文件不再复制到临时目录，保存写回真实工作区；启动失败会清掉 session 临时目录
+- 修复：空文件对比时点击或 End 键不再因 0 行索引崩溃
+- 修复：Git 写入成功但随后 status 刷新失败时，不再显示为成功
+- 修复：`--repo` 模式以与文件对比相同的方式解码工作区文本（含 UTF-16/BOM），失败给出 Notice
+- 修复：独立 Diff 的 Reload 在窗口关闭后不再碰界面，失败显示 Notice
+- 修复：图像与二进制在打开探测阶段分流，不再当全文文本读入
+- 修复：内容区最大化按钮的悬停提示随界面语言切换（中文「全窗口显示 (F11)」/「退出全窗口 (F11)」）
+
+## 优化
+
+- 优化：词级高亮文案改为「行内差异」，并说明与 Ctrl+F 搜索的区别
+- 优化：对齐 Diff 绘制缓存折行表、最大列宽与 FormattedText，大文件鼠标移动与滚动不再每帧重建
+- 优化：仓库 status 在 layout 之后并行读取 status 与 HEAD 摘要
+- 优化：Changes 页行统计可取消上一轮，并限制同时进行的 git 数
+- 优化：Diff 内搜索输入延迟 120ms 再全量扫描
+- 优化：总览去掉仅重复标签名的分区条；提交页文件列表与历史过滤条去掉重复的内容区最大化按钮（还原仍在 Diff 工具栏；总览用 F11 / Esc）
+
+# 2.0.38 - 2026-08-21
+
+## 修复
+
+- 修复：独立 Diff 打开无变更文本时显示原文；符号链接等不兼容内容显示「不支持的文件类型」，窗口不再退出
+
+# 2.0.37 - 2026-08-21
+
+## 优化
+
+- 优化：`Info.plist` 的 `LSMinimumSystemVersion` 提升至 14.0；发布脚本 `build/publish.sh` 与 `build/publish.ps1` 在 macOS 上对 `MultiGitGui-*.app` 自动执行 `codesign --sign - --deep` ad-hoc 签名，Apple Silicon 可直接启动，Windows 交叉编译的 osx bundle 明确标注为开发产物（缺少可执行位与签名，无法在 Apple Silicon 运行）
+
+## 文档
+
+- 文档：README（中英）明确 macOS 14+ 要求，说明下载 `MultiGitGui-osx-arm64.app`（Apple Silicon）与 `MultiGitGui-osx-x64.app`（Intel，Apple Silicon 需 Rosetta）的区分，阐明 ad-hoc 签名与正式分发所需 Developer ID 签名/公证的区别
+- 文档：新增 ADR-0033 固化提交页 Commit inclusion 约束（勾选不落暂存区、提交时 `restore --staged .` + `add --all` 对齐、不使用 `commit --all`）
+
+# 2.0.34 - 2026-08-20
+
+## 优化
+
+- 优化：提交页以勾选决定提交与 stash 范围，不再用暂存/取消暂存按钮；提交时才对齐暂存区（`git restore --staged .` 后 `git add --all` 勾选路径，不再使用 `commit --all`）
+
+# 2.0.29 - 2026-08-20
+
+## 修复
+
+- 修复：词级高亮与 In-diff search 在对齐视图主栏可见；忽略空白与上下文行数变更会重新读取差异；显示选项在冷启动时不再丢失
+
+## 优化
+
+- 优化：双栏视图、自动换行、其他选项、列标题对齐、行号槽随位数、代码区可过滚、双栏横向滚动按百分比同步
+- 优化：Diff 窗口标题改为 `文件名 - 完整路径`（`--title-path` 或内容路径经 `ToolWindowChrome.FormatTitle`），长路径被裁切时文件名仍可见；`git difftool` 安装命令追加 `--title-path "$MERGED"` 以显示工作区路径而非临时文件
+
+# 2.0.25 - 2026-08-21
+
+## 修复
+
+- 修复：提交页双击文件在独立 Diff 工具中打开后窗口不再立刻消失（手势结束后再启动 + 前台激活 + 加载异常兜底）
+
+## 文档
+
+- 文档：锁定 Ahead/Behind 为本机 upstream 本地计数（基于本地 remote-tracking refs，不含实时远端），Auto refresh 保持为定时静默本地状态读取（不含 fetch、不出 Result frame），与 Auto fetch 区分；同步 CONTEXT.md 与 docs/glossary.md 术语
+
+# 2.0.20 - 2026-08-20
+
+## 修复
+
+- 修复：应用内更新下载不再被共享 HttpClient 的 30 秒超时打断；版本清单请求仍为 30 秒（ADR-0008）
+- 修复：历史页在整页刷新未完成时点 Load More 会等待本次刷新，而不会取消刷新并把下一页接到旧列表后
+- 修复：Files 页搜索走 git 索引（含未忽略的未跟踪文件），匹配仍为路径/文件名子串，避免扫盘进入忽略目录
+
+## 优化
+
+- 优化：总览未推送提交仅在展开或 ahead 时查询；侧栏项目徽章缓存；git 子进程输出缓冲池化
+- 优化：安装向导背景动画在不可见时停止
+
+# 2.0.8 - 2026-08-19
+
+## 修复
+
+- 修复：对齐视图 Display column 几何（ADR-0032）——统一 `DisplayColumns` 单一标尺，CJK/全角按 2 格、Tab 永远到下一个 4 格 stop，空白 glyph 仅改墨水不压缩宽度；命中、`Caret`/选区高亮、折行切段、内容宽度与横向滚动均按格子计算，`WhitespaceDisplay.ExpandSegment` 按绝对列展开 Tab 并补空格，键盘左右按完整 Unicode 标量跳过代理对
+
+## 优化
+
+- 优化：删除 `AlignedDiffWrapMap.ViewPositionFromScreen` 7 参数旧重载，`DisplayColumns` 抽取 `TabRemainingWidth`/`GetCodePointDisplayWidth` 消除重复 Tab 公式，`DisplayColumnsTests` 与 `WhitespaceDisplay` 补齐单测
+
+# 2.0.6 - 2026-08-19
+
+## 优化
+
+- 优化：主程序与 MultiGitGuiDiff 发布启用 ReadyToRun，安装包与主程序共用一份 R2R 的 Avalonia/Core/Ui，降低独立 Diff 工具冷启动 JIT（ADR-0031）
+
+# 2.0.4 - 2026-08-19
+
+## 新增
+
+- 新增：MultiGitGuiDiff 文件对比与仓库模式关闭窗口时若有未保存修改（含未写入的编码/换行），弹出与主程序相同的层内确认框（保存并退出 / 不保存并退出 / 取消）
+
+## 优化
+
+- 优化：独立 Diff 工具文件对比 / 查看 / 合并先显示 Open shell（居中 LoadingSpinner），再加载并对齐（ADR-0030）
+
+# 2.0.2 - 2026-08-19
+
+## 新增
+
+- 新增：MultiGitGuiDiff 进程启用 in-app glass 菜单（ADR-0029）——透明叠加层与毛玻璃飞出面一致，客户端区域仍全量绘制不透桌面
+- 新增：Diff 编辑器视口 overscroll——末行可滚至视口约 30% 高处，便于导航后阅读
+- 新增：Diff 编辑器窗格右键菜单——Use this/other/both 文本块、Mark/Unmark、剪贴板（Copy/Cut/Paste）
+
+## 修复
+
+- 修复：Diff 工具菜单毛玻璃——与主程序相同启用 `OverlayPopups`，并把窗口标为 `visualEffects`，弹出菜单才能采样并模糊编辑器（ADR-0029）
+- 修复：内联视图（单栏）勾选后显示真单栏布局（删除在上、新增在下）；默认仍为双栏
+
+## 优化
+
+- 优化：Diff 编辑器 Locator 条独立右列（宽 24px、贴右对齐），移除垂直滚动条
+- 优化：转到行/帮助弹窗支持轻触关闭与正确锚点定位（命令条隐藏时回退到菜单栏密度按钮）
+- 优化：line-diff 底栏默认关闭（显示选项中仍可开启）
+- 优化：Diff 编辑器快捷键——Ctrl+M 标记差异块、Ctrl+L 折叠差异块、Ctrl+D 切换内联视图
+
+# 2.0.1 - 2026-08-18
+
+## 新增
+
+- 新增：MultiGitGuiDiff 文件对比窗口改用菜单栏 + 分组命令条（ADR-0028）——文件/查看/显示选项/工具/帮助迁至顶栏菜单；命令条仅保留编辑/导航/块操作与视图栏切换
+- 新增：命令条密度三态循环（展开带标签 → 仅图标 → 隐藏 → 展开），Ctrl+T 与菜单栏右侧按钮切换；每次打开窗口重置为展开，菜单栏不受密度控制影响
+
+## 优化
+
+- 优化：命令条内 Previous/Next、使用左/右块、查找/转到行改为上下叠放；移除组标题与复制/粘贴/删除按钮；显示选项（空白字符、比较策略、折行、EOL、line-diff、内联视图、词级高亮）统一收入菜单
+
+# 2.0.0 - 2026-08-18
+
+## 新增
+
+- 新增：自绘对齐差异视图（AlignedDiffView）——替换 ListBox + 单元格 TextBox 旧路径；常驻 Caret、跨行字符选区（Text span）与行号槽块选（Block selection）；对齐空格行留在视图层不入文件，键入不触发 LCS 重算（保存/重载才重算对齐）
+- 新增：独立 Diff 工具、主程序 Diff 页并排视图与合并编辑器统一采用对齐视图；统一/单栏布局为只读，编辑在并排（及合并 Result）窗格完成
+- 新增：对齐视图自动折行（Word wrap）及 Screen↔View 坐标映射，Caret/选区跨折行段正确
+- 新增：差异 Locator 条与底栏 line-diff 条——点击/拖动快速跳转，与垂直滚动同步
+- 新增：Moved block 检测与 gutter ↕ 标记；双击跳转到对侧对应块并选中 staging Block
+- 新增：独立 Patch 应用窗口——打开 `.patch`/`.diff` 预览 diff 并 apply 到工作区（含按文件 apply）
+- 新增：Diff 编辑器行尾（EOL）标记开关与 Marked blocks（标记行 + Keep only marked，单步撤销）
+- 新增：合并编辑器 Result 窗格打字与 Accept 冲突块共享一条撤销时间线——Ctrl+Z 先撤最后一次编辑，撤 Accept 同步恢复冲突列表与三栏着色
+
+## 优化
+
+- 优化：删除废弃的 `CodeEditorView` 控件与 `CodeEditorTests`；Diff/Merge 编辑器不再走文档级撤销 fallback
+- 优化：Patch 文件打开对话框类型名本地化，并增加「所有文件」筛选（拖放仍限 `.patch`/`.diff`）
+- 新增：MultiGitGuiDiff 编辑器双栏等宽与共享横向滚动——左右两栏严格各占视口一半，行号槽与中缝固定不动，超长行通过底部共享横向滚动条在两栏内同步滚动（列表横向滚动已移除）；中缝改为贯穿整高竖线，行复制箭头仍保留在固定中缝槽内
+- 新增：MultiGitGuiDiff 支持纯文本查看器——`MultiGitGuiDiff <单文件>` 以只读查看器打开单个文件（行号/语法高亮/状态栏），文件页右键菜单可「在文本查看器中查看」
+- 新增：MultiGitGuiDiff 编辑器工具栏窄窗口自适应——窗口宽度不足 860px 时自动隐藏按钮文字与分组标题并收紧间距（不影响用户显式的展开/收起选择）；收起态按钮收紧为方形图标目标，分组标题随收起一并隐藏；窗口顶栏改为自动换行布局，窄窗口不再溢出
+- 新增：MultiGitGuiDiff 使用自定义应用图标（深色圆角方块 + 红绿双栏 + 底部白色 chevron），窗口标题栏/任务栏与 exe 图标同步替换默认图标
+- 新增：MultiGitGuiDiff 编辑器工具栏展开时按「编辑 / 导航 / 块 / 空白字符 / 视图」分类显示，每组带小标题（收起后隐藏标题与按钮文字）；状态栏行尾（LF/CRLF）改为下拉切换，保存时按所选行尾整体重写
+- 新增：MultiGitGuiDiff 顶栏新增主题按钮，可循环切换 浅色 / 深色 / 跟随系统
+- 新增：MultiGitGuiDiff 编辑器补齐 TortoiseGitMerge 风格行操作——点击行号选择、拖拽/Shift 范围多选、Ctrl 多选，「使用左边/右边文件块」整块复制（单步撤销）、删除选中行、Ctrl+A 全选
+- 新增：MultiGitGuiDiff 编辑器差异导航（上一处/下一处差异、滚动并选中整个差异块），工具栏按 编辑/导航/块/空白字符/视图 分组
+- 新增：MultiGitGuiDiff 编辑器查找（Ctrl+F，F3/Shift+F3 前后跳转，n/m 计数）与跳到行（Ctrl+G）
+- 新增：MultiGitGuiDiff 编辑器底部状态栏（光标列、当前行预览、编码、EOL、Tab 宽度、+N −M 统计）
+- 新增：MultiGitGuiDiff 编辑器字符级差异高亮（修改行仅标出实际变化的词）、差异块分隔线、「忽略空白字符」开关
+- 新增：MultiGitGuiDiff 编辑器重新加载、复制/粘贴选中行到剪贴板；仓库模式下「标记为已解决」（git add 该文件）
+- 新增：MultiGitGuiDiff 编辑器内嵌差异导航（Ctrl+Alt+↑/↓）与仓库模式「视图栏」切换文件列表
+- 新增：MultiGitGuiDiff 编辑器补齐 TortoiseGitMerge 剩余功能——词级高亮开关、「比较空白字符」、文本级块复制（使用左/右边文本块）、冲突导航（⚔，识别冲突标记）、折叠/展开差异块（▾，Ctrl+M）、帮助弹窗（?）、状态栏编码下拉（UTF-8/UTF-8 BOM/UTF-16 LE/BE/ASCII，保存按所选编码写回）、状态栏双行预览
+- 新增：MultiGitGuiDiff 编辑器「内联视图（单栏）」切换——工具栏开关按钮，开启后修改行按「删除行在上、新增行在下」堆叠为统一 diff 单栏显示，可正常编辑、行选择、块复制、折叠与搜索（选中与统计按会话行去重，不因展开重复计数）
+- 新增：MultiGitGuiDiff 编辑器工具栏收起/展开——箭头按钮或 Ctrl+T 切换：展开（默认）按钮显示图标+文字并自动换行成多行；收起后仅显示图标、单行紧凑，为对比区省出纵向空间
+- 新增：MultiGitGuiDiff 合并模式关闭窗口时若有未保存修改，先弹出内联确认条（保存并关闭 / 放弃修改并退出 / 继续编辑），不再静默丢弃并以退出码 0 告知 git「已解决」
+- 新增：MultiGitGuiDiff 编辑器查找替换（Ctrl+H 或查找栏）——「替换」作用于当前匹配行（可写两侧、忽略大小写、替换后自动跳到下一处匹配），「全部替换」一次撤销整批完成；只读侧（如仓库模式 HEAD）自动跳过
+- 新增：MultiGitGuiDiff 编辑器「使用左边/右边文件」整文件级采用（对齐折叠为一致内容，单步撤销，只读目标侧自动禁用）与「另存为…」（右侧结果另存到所选路径）
+- 新增：MultiGitGuiDiff 编辑器快捷键补齐——Ctrl+C 复制选中行、Ctrl+V 粘贴到选中行（单元格编辑中仍为原生行为）、F8/Shift+F8 跳转下一处/上一处差异；帮助弹窗同步列出
+- 新增：MultiGitGuiDiff 文件对比窗口与仓库模式窗口的顶栏支持收起/展开（左侧箭头按钮）；仓库模式收起后仍显示分支徽章与文件汇总
+- 新增：推送对话框可勾选「提升推送兼容性」，为本次计划中的每条 git push 加上 --no-thin
+- 新增：总览展开后的未推送提交可双击或按 Enter 跳到历史页，自动选中该提交并打开详情
+
+## 优化
+
+- 优化：并排 Diff 与 MultiGitGuiDiff 双栏编辑器明确左右语义——左侧标注「原始」、右侧标注「现在」，与 TortoiseGit 双文件对比一致；主程序并排 Diff 顶部增加两栏标题
+- 优化：MultiGitGuiDiff 双栏改为完整窗格布局——左右两栏从标题条到底部始终有整列窗格底色（空侧不再透明）、行间无缝、中间贯穿竖直分隔线、复制箭头叠加在分隔线上、行高统一；左右各加与窗格同宽的标题条；状态栏显示左侧文件实际编码与行尾（如 UTF-8 · LF）
+- 修复：MultiGitGuiDiff 双栏在横向滚动容器中右栏被推出可视区（左栏改为按内容宽度、右栏填充剩余宽度），并保留完整窗格底色与竖直分隔线
+- 修复：MultiGitGuiDiff 文本查看器窗口启动时因 ThemeHost 控件字段未初始化而崩溃（改用 Avalonia 编译生成的 InitializeComponent）
+- 优化：清理 MultiGitGuiDiff/主程序零引用的死图标（MggIconArrowUpward/Downward），Undo 图标改为 Reset 的别名；窗口顶栏图标资源改为 TryFindResource 安全解析，键缺失不再崩溃；窗口条带收起快捷键 Ctrl+T 在文件对比/仓库模式窗口级同样生效（与工具提示一致）
+- 优化：MultiGitGuiDiff 修复——行间复制箭头的启用状态此前检查源侧而非目标侧（仓库模式下最有用的「→ 拷到工作区」被禁用、会写只读 HEAD 的「←」反而可用）；单行复制、右键菜单插入/删除此前绕过「启用编辑」开关与只读侧限制；Ctrl+Z 撤销已保存的修改后脏标记不恢复（界面显示与磁盘不一致却不能保存）。以上均按 TortoiseGitMerge 语义修正并附回归测试
+- 优化：MultiGitGuiDiff 编辑器工具栏焕新——统一 Material 图标、按 编辑/导航/块/视图开关 分组，按钮默认带文字标签（可随工具栏收起为纯图标），查找栏同步美化
+- 优化：MultiGitGuiDiff 编辑器选中行数与保存/提示状态并入底部状态栏右侧，工具栏不再拥挤；两侧文件标题改为徽章样式并带「只读」标记
+- 优化：MultiGitGuiDiff 文件对比窗口顶栏焕新——「浏览/编辑」改为分段式切换，「安装为 git 工具 / 系统菜单集成」归入同一操作条；仓库模式顶栏改为分支徽章 + 汇总 + 分段切换 + 刷新图标按钮，合并模式取消按钮所在条带统一视觉
+- 优化：历史页提交详情的说明、文件列表、Diff 可拖动调整高度（最小约一行），并记住上次大小
+- 优化：改动页文件右键菜单新增「还原」（未暂存/未跟踪文件；勾选优先于当前行，确认框与工具栏一致）；工具栏「丢弃」同步改为「还原」
+- 优化：改动标签页名称由「改动 / Changes」改为「提交 / Commit」
+- 优化：发布/打包脚本检测到仓库内正在运行的开发实例时立即报错并提示关闭，不再以晦涩的文件占用错误（MSB3027）失败
+
+## 新增
+
+- 新增：Diff 页语法高亮（常见语言按扩展名/内容识别），词级高亮优先、搜索高亮置顶
+- 新增：Diff 页文件头显示 +N/−M 统计，顶部汇总「N 个文件变更，+X −Y」
+- 新增：Diff 导航——Ctrl+Alt+↑/↓ 跳转上一个/下一个 hunk，Ctrl+Alt+←/→ 跳转上一个/下一个文件，Ctrl+F 在差异内搜索（含高亮与计数），大差异可「显示更多行」增量加载
+- 新增：并排视图支持多选行级暂存/还原，变更块按内容对齐，滚动时顶部悬浮当前 hunk 标题
+- 新增：冲突文件可从「提交」页打开「合并编辑器」（我方/基线/对方三窗 + 可编辑结果），支持按冲突采用我方/对方/两边都保留、Ctrl+S 保存、保存后自动标记已解决
+- 新增：独立 Diff/合并工具 MultiGitGuiDiff.exe——比较任意两个文件，或 --merge 三路合并；窗口内一键安装为 git difftool/mergetool；随发布脚本一同产出
+- 新增：Diff 页「仅看变更」视图、连续上下文折叠（点击展开）、复制整个差异为补丁、后退/前进浏览历史（Alt+←/→）、位置书签（Ctrl+Shift+1..9 标记 / Ctrl+Alt+1..9 跳转）、状态栏行数/文件/统计
+- 新增：MultiGitGuiDiff 支持 --repo 打开仓库未提交改动视图；可安装/移除 Windows 系统菜单集成（「发送到」对比两个文件、仓库文件夹右键查看改动），支持 --install-shell / --uninstall-shell
+- 新增：主程序可唤起 MultiGitGuiDiff——提交页右键/双击文件「在 MultiGitGuiDiff 中打开」（工作区 vs HEAD），历史详情文件右键「在 MultiGitGuiDiff 中比较」（提交 vs 父提交），文件页右键「在 MultiGitGuiDiff 中打开」（HEAD vs 工作区）
+- 新增：独立 Diff 工具测试抽为 MultiGitGui.DiffTool.Tests 单独项目；build/run-tests.ps1 按 git 改动自动只跑受影响的测试项目（-Scope diff/app/core/all 手动指定），避免无关模块的无效测试时长
+- 新增：独立 Diff 工具的文件对比（MultiGitGuiDiff <left> <right> 与 --repo）改为可编辑双栏编辑器——左右两侧都能点击直接输入（Enter 换行、Shift+Enter 提交、Tab 下移、Escape 取消、空行 Backspace/Delete 删除行），中间复制箭头一键把行复制到另一侧，Ctrl+Z/Y 撤销重做，Ctrl+S 保存回文件（保留 BOM 与换行风格）；工具栏可显示空白字符（空格圆点、制表符箭头）与自动换行；--repo 模式左侧为 HEAD 只读、右侧为工作区，保存即写回工作区并刷新浏览视图；「浏览/编辑」可随时切回经典统一/并排 Diff（搜索、hunk 跳转、书签）
+- 修复：Diff 与合并编辑器的行文本被渲染两遍（Avalonia 12 下 InlineCollection 会把 TextBlock 的 Text 提前转成一个 Run，与分段高亮 Run 叠加），修复后所有差异视图文字恢复正常
+- 修复：独立 Diff 工具启动时 git 子进程不再闪出控制台窗口（CreateNoWindow），只出现一个工具窗口
+
+## 优化
+
+- 优化：Diff 与编辑器代码抽入共享 MultiGitGui.Ui 库，主程序与独立工具渲染一致
+- 优化：历史页提交详情的说明、文件列表、Diff 可拖动调整高度（最小约一行），并记住上次大小
+- 优化：改动页文件右键菜单新增「还原」（未暂存/未跟踪文件；勾选优先于当前行，确认框与工具栏一致）；工具栏「丢弃」同步改为「还原」
+- 优化：改动标签页名称由「改动 / Changes」改为「提交 / Commit」
+- 优化：发布/打包脚本检测到仓库内正在运行的开发实例时立即报错并提示关闭，不再以晦涩的文件占用错误（MSB3027）失败
+
+## 修复
+
+- 修复：历史页文件右键「在 MultiGitGuiDiff 中比较」此前点击无反应——提交详情未携带仓库路径导致命令静默返回，现已修复并补集成测试
+
+# 1.9.54 - 2026-08-14
+
+## 修复
+
+- 修复：添加存储库对话框勾选或取消「继续扫描存储库内部」等扫描选项后，立即按新选项重新扫描
 ## 2.1.2 (2026-08-25)
 
 # MultiGitGui 更新日志
