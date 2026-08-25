@@ -54,6 +54,7 @@ jobs:
             exit 1
           fi
           url="$(printf '%s' "$json" | jq -r --arg n "$asset" '.assets[] | select(.name == $n) | .url')"
+          asset_size="$(printf '%s' "$json" | jq -r --arg n "$asset" '.assets[] | select(.name == $n) | .size')"
           changelog="$(printf '%s' "$json" | jq -r '.assets[] | select(.name | test("^CHANGELOG\\.md$"; "i")) | .name' | head -n 1)"
           if [ -z "$changelog" ] || [ "$changelog" = "null" ]; then
             echo "::error::No CHANGELOG.md asset in release. Available assets:"
@@ -61,12 +62,15 @@ jobs:
             exit 1
           fi
           changelog_url="$(printf '%s' "$json" | jq -r --arg n "$changelog" '.assets[] | select(.name == $n) | .url')"
+          changelog_size="$(printf '%s' "$json" | jq -r --arg n "$changelog" '.assets[] | select(.name == $n) | .size')"
           published_at="$(printf '%s' "$json" | jq -r '.published_at // empty')"
           echo "asset=${asset}" >> "$GITHUB_OUTPUT"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
           echo "url=${url}" >> "$GITHUB_OUTPUT"
+          echo "asset_size=${asset_size}" >> "$GITHUB_OUTPUT"
           echo "changelog=${changelog}" >> "$GITHUB_OUTPUT"
           echo "changelog_url=${changelog_url}" >> "$GITHUB_OUTPUT"
+          echo "changelog_size=${changelog_size}" >> "$GITHUB_OUTPUT"
           echo "published_at=${published_at}" >> "$GITHUB_OUTPUT"
           echo "Resolved asset: ${asset} (v${version}), changelog: ${changelog}"
 
@@ -76,19 +80,43 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p installer
+          asset="${{ steps.release.outputs.asset }}"
+          expected_size="${{ steps.release.outputs.asset_size }}"
+          local_path="installer/${asset}"
           curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/octet-stream" \
-            -o "installer/${{ steps.release.outputs.asset }}" \
+            -o "${local_path}" \
             "${{ steps.release.outputs.url }}"
-          ls -lh "installer/${{ steps.release.outputs.asset }}"
+          actual_size="$(stat -c%s "${local_path}")"
+          if [ "$actual_size" != "$expected_size" ]; then
+            echo "::error::Installer size mismatch: expected ${expected_size}, got ${actual_size}"
+            exit 1
+          fi
+          hex="$(head -c 2 "${local_path}" | xxd -p -c 2)"
+          if [ "$hex" != "4d5a" ]; then
+            echo "::error::Installer does not start with MZ (got ${hex}) - possible multipart pollution or JSON error response"
+            exit 1
+          fi
+          ls -lh "${local_path}"
 
       - name: Download CHANGELOG.md
         env:
           GH_API_TOKEN: ${{ secrets.GH_API_TOKEN }}
         run: |
           set -euo pipefail
+          expected_size="${{ steps.release.outputs.changelog_size }}"
           curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/octet-stream" \
             -o /tmp/CHANGELOG.md \
             "${{ steps.release.outputs.changelog_url }}"
+          actual_size="$(stat -c%s /tmp/CHANGELOG.md)"
+          if [ "$actual_size" != "$expected_size" ]; then
+            echo "::error::CHANGELOG size mismatch: expected ${expected_size}, got ${actual_size}"
+            exit 1
+          fi
+          first_char="$(head -c 1 /tmp/CHANGELOG.md)"
+          if [ "$first_char" = "{" ] || [ "$first_char" = "<" ]; then
+            echo "::error::CHANGELOG.md looks like JSON/HTML, not Markdown"
+            exit 1
+          fi
           echo "Downloaded ${{ steps.release.outputs.changelog }}:"
           head -n 5 /tmp/CHANGELOG.md
 

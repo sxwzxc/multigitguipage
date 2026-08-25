@@ -39,7 +39,7 @@ jobs:
             echo "::error::Source release not found"
             exit 1
           fi
-          printf '%s' "$json" | jq -r '.assets[] | [.name, .url] | @tsv' > /tmp/assets.tsv
+          printf '%s' "$json" | jq -r '.assets[] | [.name, .url, .size] | @tsv' > /tmp/assets.tsv
           printf '%s' "$json" | jq -r .body > /tmp/release-body.md
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
           echo "Resolved source release: ${tag}, assets: $(wc -l < /tmp/assets.tsv)"
@@ -81,7 +81,7 @@ jobs:
           set -euo pipefail
           upload_base="${{ steps.target.outputs.upload_base }}"
           mkdir -p /tmp/assets-dl
-          while IFS=$'\t' read -r name url; do
+          while IFS=$'\t' read -r name url expected_size; do
             name="$(basename -- "$name")"
             local_path="/tmp/assets-dl/${name}"
 
@@ -99,15 +99,47 @@ jobs:
             curl -fsSL -H "Authorization: Bearer ${GH_API_TOKEN}" -H "Accept: application/octet-stream" \
               -o "${local_path}" "${url}"
 
-            # 上传到 public 仓库 release
+            actual_size="$(stat -c%s "${local_path}")"
+            if [ "$actual_size" != "$expected_size" ]; then
+              echo "::error::Download size mismatch for ${name}: expected ${expected_size}, got ${actual_size}"
+              exit 1
+            fi
+            if [[ "$name" == *.exe ]]; then
+              hex="$(head -c 2 "${local_path}" | xxd -p -c 2)"
+              if [ "$hex" != "4d5a" ]; then
+                echo "::error::${name} does not start with MZ (got ${hex}) - possible multipart pollution or JSON error response"
+                exit 1
+              fi
+            fi
+            if [[ "${name,,}" == "changelog.md" ]]; then
+              first_char="$(head -c 1 "${local_path}")"
+              if [ "$first_char" = "{" ] || [ "$first_char" = "<" ]; then
+                echo "::error::${name} looks like JSON/HTML, not Markdown"
+                exit 1
+              fi
+            fi
+
+            # 上传到 public 仓库 release（原始二进制，禁止 multipart -F）
             qname="$(jq -rn --arg v "$name" '$v|@uri')"
             curl -fsSL -X POST \
               -H "Authorization: Bearer ${GITHUB_TOKEN}" \
               -H "Accept: application/vnd.github+json" \
-              -F "file=@${local_path};filename=${name}" \
+              -H "Content-Type: application/octet-stream" \
+              -T "${local_path}" \
               "${upload_base}?name=${qname}" > /tmp/upload-resp.json
-            size="$(stat -c%s "${local_path}")"
-            echo "forwarded: ${name} (${size} bytes)"
+
+            resp_state="$(jq -r .state /tmp/upload-resp.json)"
+            resp_size="$(jq -r .size /tmp/upload-resp.json)"
+            if [ "$resp_state" != "uploaded" ]; then
+              echo "::error::Upload failed for ${name}: state=${resp_state}"
+              cat /tmp/upload-resp.json
+              exit 1
+            fi
+            if [ "$resp_size" != "$actual_size" ]; then
+              echo "::error::Upload size mismatch for ${name}: local=${actual_size}, remote=${resp_size}"
+              exit 1
+            fi
+            echo "forwarded: ${name} (${actual_size} bytes)"
             rm -f "${local_path}"
           done < /tmp/assets.tsv
 
@@ -115,9 +147,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
+          set -euo pipefail
+          tag="${{ steps.source.outputs.tag }}"
+          payload="$(jq -n --arg ref "main" --arg tag "$tag" '{ref: $ref, inputs: {tag: $tag}}')"
           curl -fsSL -X POST \
             -H "Authorization: Bearer ${GITHUB_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
-            -d '{"ref":"main"}' \
+            -d "$payload" \
             "https://api.github.com/repos/sxwzxc/multigitguipage/actions/workflows/update-installer.yml/dispatches"
-          echo "Dispatched update-installer.yml"
+          echo "Dispatched update-installer.yml for tag ${tag}"
