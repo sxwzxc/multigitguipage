@@ -1,10 +1,10 @@
 {
   "platform": "win32",
-  "version": "2.1.7",
-  "publishedAt": "2026-08-26T11:36:36Z",
-  "file": "MultiGitGui-Setup-2.1.7.exe",
-  "size": 86918144,
-  "sha256": "bf31ac48bc224207403ce77d0c7de665bee1cc1090556919faa911e6e98d3040",
-  "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-2.1.7.exe",
-  "changelogUrl": "/api/changelog/2.1.7.md"
+  "version": "2.1.8",
+  "publishedAt": "2026-08-27T06:13:33Z",
+  "file": "MultiGitGui-Setup-2.1.8.exe",
+  "size": 86967296,
+  "sha256": "e6d26705af33da2ca1ee77dd10de168021fe6da3b294a5e738e65d841204d63f",
+  "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-2.1.8.exe",
+  "changelogUrl": "/api/changelog/2.1.8.md"
 }

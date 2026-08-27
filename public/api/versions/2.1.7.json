@@ -2,13 +2,5 @@
   "version": "2.1.7",
   "publishedAt": "2026-08-26",
   "changelogUrl": "/api/changelog/2.1.7.md",
-  "installer": {
-    "version": "2.1.7",
-    "file": "MultiGitGui-Setup-2.1.7.exe",
-    "size": 86918144,
-    "parts": 5,
-    "chunkSize": 20971520,
-    "sha256": "bf31ac48bc224207403ce77d0c7de665bee1cc1090556919faa911e6e98d3040",
-    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-2.1.7.exe"
-  }
+  "installer": null
 }
