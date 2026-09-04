@@ -2,13 +2,5 @@
   "version": "3.3.4",
   "publishedAt": "2026-09-04",
   "changelogUrl": "/api/changelog/3.3.4.md",
-  "installer": {
-    "version": "3.3.4",
-    "file": "MultiGitGui-Setup-3.3.4.exe",
-    "size": 87314432,
-    "parts": 5,
-    "chunkSize": 20971520,
-    "sha256": "90d5a383caafa04acec1f710ffaab26da8a8f46f82894e885ef1c8d564b22b5e",
-    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-3.3.4.exe"
-  }
+  "installer": null
 }

@@ -1,3 +1,21 @@
+## 3.3.5 (2026-09-04)
+
+## 修复
+
+- 修复：Diff 编辑整行删除/清空不再丢掉后续行——`EditableDocument.ReplaceLine` 清空时保留行数，避免 `DiffEditSession` 行索引错位（`src/MultiGitGui.Core/Editor/EditableDocument.cs`）
+- 修复：变基工作台暂停关闭文案不再称「窗口」；保留合并的合并提交可 pick/drop/reword（drop 注释该 merge 行），不再锁死 combo；Completed/Aborted 关闭 overlay 时 `ClearAsync` 清会话，再次打开从 Planning 起（ADR-0050/0051/0053）
+
+## 优化
+
+- 优化：Gerrit 连接/Review/Reviewer 等对话框改用 `inlineRow`/`inlineLabel` 与 SharedSize 对齐，窄宽下标签与控件不再挤乱（`src/MultiGitGui.App/Views/Dialogs/DialogTemplates.Gerrit.axaml`）
+- 优化：DataGrid 表头列间竖线改为右缘叠加、像素对齐并内缩 1px，刷子改用明暗对比足够的 `MggDataGridSeparatorBrush`，避免分数 DPI 下被挤没或发虚；Gerrit 助手列表补 `HeadersVisibility=Column` 与横向网格线（`src/MultiGitGui.Ui/Styles/Theme.DataGrid.axaml`，`src/MultiGitGui.App/Views/Gerrit/GerritHelperView.axaml`）
+- 优化：单仓普通 Rebase 仍走 ADR-0013 缓存预览对话框，仅交互式变基打开变基工作台；中断 Continue 对工作台 babysit 中的仓库不抢 sequencer
+- 优化：作用域工具栏「合并」移入「更多」，「交互式变基」升到「变基」右侧
+- 优化：总览提交详情去掉 overlay 内嵌 Diff，文件双击/右键改在 MultiGitGuiDiff 中对比父提交与该提交（`src/MultiGitGui.App/Views/Dialogs/CommitDetailsDialogView.axaml`，`src/MultiGitGui.App/ViewModels/Dialogs/CommitDetailsDialogViewModel.cs`）
+
+## 文档
+
+- 文档：ADR-0050（原生 sequencer 捕获并变换 todo）、ADR-0051（会话与助手位于 Git 路径下）、ADR-0052（独立窗口，已被 supersede）、ADR-0053（Settings 式 overlay，会话可长于 overlay）；`CONTEXT.md` / `docs/glossary.md` / README（中英）补充 Rebase workbench、Commit details dialog、Force replay vs Force push、Split commit
 ## 3.3.4 (2026-09-04)
 
 ## 修复
