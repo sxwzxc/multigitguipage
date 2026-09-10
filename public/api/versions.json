@@ -1,6 +1,11 @@
 {
-  "latest": "3.3.5",
+  "latest": "3.4.9",
   "versions": [
+    {
+      "version": "3.4.9",
+      "publishedAt": "2026-09-10",
+      "changelogUrl": "/api/changelog/3.4.9.md"
+    },
     {
       "version": "3.3.5",
       "publishedAt": "2026-09-04",
