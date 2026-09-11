@@ -3,24 +3,40 @@ import type { Translation } from './zh';
 export const en: Translation = {
   lang: 'en',
   meta: {
-    title: 'MultiGitGui — One project, every repository',
+    title: 'MultiGitGui — Multi-repo Git desktop client',
     description:
-      'A cross-platform Git desktop GUI built for multi-repository workflows. Powered by .NET 10 and Avalonia, for Windows, macOS and Linux.',
+      'MultiGitGui — also called MultiGit — is a free cross-platform Git GUI for multi-repository projects. Batch fetch, pull, push and checkout across every repo — for Windows, macOS and Linux.',
+    keywords: [
+      'MultiGitGui',
+      'MultiGit',
+      'multigitgui',
+      'multigit',
+      'Git GUI',
+      'Git client',
+      'Git desktop client',
+      'multi-repo',
+      'multi repository',
+      'Gerrit',
+      'Windows Git',
+    ],
   },
   nav: {
+    about: 'About',
     features: 'Features',
     download: 'Download',
     faq: 'FAQ',
     switchLang: '中',
   },
   hero: {
+    name: 'MultiGitGui',
+    aka: 'Also called MultiGit · free multi-repo Git desktop client',
     badge: 'v3.4.9 · Cross-platform · Free',
     title1: 'One project, ',
     title2: 'every repository',
     subtitle:
       'MultiGitGui is a cross-platform Git desktop client built for multi-repository workflows. Group every repository involved in one piece of work into a project, then fetch, pull, push, checkout, reset and stash run across the whole project — while each repository keeps its own branch, upstream and state.',
     ctaDownload: 'Download MultiGitGui',
-    ctaFeatures: 'Explore features',
+    ctaFeatures: 'About MultiGitGui',
     platformNote: 'Windows 10+ · macOS 12+ · Linux x64 / arm64',
   },
   mockup: {
@@ -34,6 +50,20 @@ export const en: Translation = {
     synced: 'Synced',
     modified: 'Modified',
     conflict: 'Conflict',
+  },
+  about: {
+    label: '01 · about',
+    title: 'What is MultiGitGui',
+    lead:
+      'MultiGitGui is the full name of this app; it is also called MultiGit. It is a free, cross-platform Git desktop client for work that spans many repositories in one project.',
+    body:
+      'Group related repositories into a project, then fetch, pull, push, checkout, reset and stash run across the whole project — each repository keeps its own branch and state. MultiGitGui does not bundle Git; it drives the Git you already use, so credential helpers, hooks and SSH keep working. Available for Windows, macOS and Linux.',
+    facts: [
+      { title: 'Name', desc: 'Full name MultiGitGui, also called MultiGit.' },
+      { title: 'Type', desc: 'A multi-repo Git GUI — a desktop Git client.' },
+      { title: 'Platforms', desc: 'Native app for Windows, macOS and Linux.' },
+      { title: 'License', desc: 'Free to use — no paid tiers or subscriptions.' },
+    ],
   },
   features: {
     title: 'Designed for real multi-repo workflows',
@@ -123,6 +153,10 @@ export const en: Translation = {
     title: 'Frequently asked questions',
     items: [
       {
+        q: 'Are MultiGit and MultiGitGui the same app?',
+        a: 'Yes. MultiGitGui is the full name; MultiGit is the shorter name for the same free multi-repo Git desktop client, used to manage many Git repositories in one project.',
+      },
+      {
         q: 'Do I need to install Git myself?',
         a: 'Yes. MultiGitGui does not bundle Git — it drives the Git you choose (2.30 or newer), so your credential helpers, hooks and SSH setup keep working. You can also point the app at a specific Git executable in Settings.',
       },
@@ -149,9 +183,10 @@ export const en: Translation = {
     ],
   },
   footer: {
-    tagline: 'A multi-repository Git desktop client for cross-repo workflows.',
+    tagline: 'MultiGitGui — also called MultiGit — is a multi-repository Git desktop client for cross-repo workflows.',
     product: 'Product',
     platforms: 'Platforms',
+    aboutLink: 'About',
     featuresLink: 'Features',
     downloadLink: 'Download',
     faqLink: 'FAQ',
@@ -159,6 +194,7 @@ export const en: Translation = {
     mac: 'macOS 12+',
     linux: 'Linux x64 / arm64',
     copyright: '© {year}. All rights reserved.',
+    botsAllowed: 'Search engines, crawlers, and automation are explicitly allowed — no restrictions',
   },
   feedback: {
     button: 'Feedback',

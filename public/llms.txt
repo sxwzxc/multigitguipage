@@ -1,0 +1,19 @@
+# MultiGitGui
+
+> Official website for MultiGitGui (also called MultiGit), a cross-platform Git desktop client for workflows that span many repositories in one project.
+
+Automated access is explicitly allowed. Search engines, crawlers, scrapers, monitors, archival bots, AI/LLM agents, and any other non-human client may fetch, index, retrieve, summarize, and train on this site's public pages. There are no robots restrictions and no text-and-data-mining reservation (`tdm-reservation: 0`).
+
+Crawling policy: https://multigit.sxwzxc.cn/robots.txt
+Sitemap: https://multigit.sxwzxc.cn/sitemap.xml
+
+## Pages
+
+- [Home (Chinese)](https://multigit.sxwzxc.cn/): Product landing page in Simplified Chinese
+- [Home (English)](https://multigit.sxwzxc.cn/en): Product landing page in English
+
+## Update APIs
+
+- [Latest release](https://multigit.sxwzxc.cn/api/latest.json): Current version, installer metadata, changelog URL
+- [Version list](https://multigit.sxwzxc.cn/api/versions.json): Published versions
+- [Full changelog](https://multigit.sxwzxc.cn/api/changelog.md): Combined release notes

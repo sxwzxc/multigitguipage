@@ -34,7 +34,7 @@ export default function DownloadSection({ t }: Props) {
 
       <div className="container relative max-w-6xl px-4 md:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="mono-label">02 · release</p>
+          <p className="mono-label">03 · release</p>
           <h2 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
             {t.download.title}
           </h2>

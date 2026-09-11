@@ -138,12 +138,20 @@ export default function Hero({ t }: Props) {
               {t.hero.badge}
             </p>
             <h1 className="mt-7 text-4xl font-semibold leading-[1.12] tracking-tight text-slate-900 md:text-5xl xl:text-[3.4rem]">
-              {t.hero.title1}
-              <span className="bg-gradient-to-r from-primary via-cyan-500 to-violet-500 bg-clip-text text-transparent">
-                {t.hero.title2}
+              <span className="block font-mono text-[1.35rem] font-semibold tracking-tight text-slate-900 md:text-[1.65rem] xl:text-[1.85rem]">
+                {t.hero.name}
+              </span>
+              <span className="mt-3 block">
+                {t.hero.title1}
+                <span className="bg-gradient-to-r from-primary via-cyan-500 to-violet-500 bg-clip-text text-transparent">
+                  {t.hero.title2}
+                </span>
               </span>
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-slate-600 lg:mx-0 md:text-lg">
+            <p className="mx-auto mt-4 max-w-xl font-mono text-xs tracking-wide text-slate-500 lg:mx-0 md:text-sm">
+              {t.hero.aka}
+            </p>
+            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-600 lg:mx-0 md:text-lg">
               {t.hero.subtitle}
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
@@ -155,7 +163,7 @@ export default function Hero({ t }: Props) {
                 {t.hero.ctaDownload}
               </a>
               <a
-                href="#features"
+                href="#about"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/70 px-7 py-3.5 text-sm font-medium text-slate-700 backdrop-blur transition-colors hover:border-slate-300 hover:text-slate-900 sm:w-auto"
               >
                 {t.hero.ctaFeatures}

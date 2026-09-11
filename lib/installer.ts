@@ -14,3 +14,8 @@ export const windowsInstaller = {
   sha256: '5f63af5e045cb62a6e97ef0f424ad4d434fae674c35757d5a33db3c143a808cb',
   directUrl: 'https://multigit.shenxw.cn/MultiGitGui-Setup-3.4.9.exe',
 } as const;
+
+export function installerVersion(): string {
+  const match = windowsInstaller.file.match(/MultiGitGui-Setup-(.+)\.exe$/i);
+  return match?.[1] ?? windowsInstaller.file;
+}

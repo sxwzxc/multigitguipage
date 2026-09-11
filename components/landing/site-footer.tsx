@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { Monitor, Laptop, Terminal } from 'lucide-react';
 import FeedbackDialog from '@/components/landing/feedback-dialog';
 import type { Translation } from '@/lib/locales/zh';
@@ -16,6 +17,7 @@ export default function SiteFooter({ t }: Props) {
     {
       title: t.footer.product,
       links: [
+        { name: t.footer.aboutLink, href: '#about' },
         { name: t.footer.featuresLink, href: '#features' },
         { name: t.footer.downloadLink, href: '#download' },
         { name: t.footer.faqLink, href: '#faq' },
@@ -36,7 +38,11 @@ export default function SiteFooter({ t }: Props) {
       <div className="container max-w-6xl px-4 md:px-6">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <div className="flex items-center gap-2.5">
+            <Link
+              href={t.lang === 'en' ? '/en' : '/'}
+              className="flex items-center gap-2.5"
+              aria-label="MultiGitGui, also called MultiGit"
+            >
               <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white/70 shadow-sm">
                 <Image
                   src="/logo.png"
@@ -49,7 +55,7 @@ export default function SiteFooter({ t }: Props) {
               <span className="font-mono text-sm font-semibold tracking-tight text-slate-900">
                 MultiGit<span className="text-primary">Gui</span>
               </span>
-            </div>
+            </Link>
             <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-slate-500">
               {t.footer.tagline}
             </p>
@@ -57,7 +63,7 @@ export default function SiteFooter({ t }: Props) {
 
           {columns.map((col) => (
             <div key={col.title}>
-              <h4 className="mono-label text-[10px]">{col.title}</h4>
+              <p className="mono-label text-[10px]">{col.title}</p>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.name}>
@@ -76,9 +82,17 @@ export default function SiteFooter({ t }: Props) {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-slate-200/60 pt-6 sm:flex-row">
-          <p className="font-mono text-[11px] text-slate-400">
-            {t.footer.copyright.replace('{year}', String(year))}
-          </p>
+          <div className="flex flex-col items-center gap-1.5 sm:items-start">
+            <p className="font-mono text-[11px] text-slate-400">
+              {t.footer.copyright.replace('{year}', String(year))}
+            </p>
+            <a
+              href="/robots.txt"
+              className="font-mono text-[11px] text-slate-400 transition-colors hover:text-primary"
+            >
+              {t.footer.botsAllowed}
+            </a>
+          </div>
           <div className="flex items-center gap-4">
             <p className="font-mono text-[11px] text-slate-400">.NET 10 · Avalonia · Win / macOS / Linux</p>
             <FeedbackDialog t={t} />

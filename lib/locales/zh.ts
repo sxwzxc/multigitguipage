@@ -2,9 +2,11 @@ export type Lang = 'zh' | 'en';
 
 export interface Translation {
   lang: Lang;
-  meta: { title: string; description: string };
-  nav: { features: string; download: string; faq: string; switchLang: string };
+  meta: { title: string; description: string; keywords: readonly string[] };
+  nav: { about: string; features: string; download: string; faq: string; switchLang: string };
   hero: {
+    name: string;
+    aka: string;
     badge: string;
     title1: string;
     title2: string;
@@ -24,6 +26,13 @@ export interface Translation {
     synced: string;
     modified: string;
     conflict: string;
+  };
+  about: {
+    label: string;
+    title: string;
+    lead: string;
+    body: string;
+    facts: readonly { title: string; desc: string }[];
   };
   features: {
     title: string;
@@ -63,6 +72,7 @@ export interface Translation {
     tagline: string;
     product: string;
     platforms: string;
+    aboutLink: string;
     featuresLink: string;
     downloadLink: string;
     faqLink: string;
@@ -70,6 +80,7 @@ export interface Translation {
     mac: string;
     linux: string;
     copyright: string;
+    botsAllowed: string;
   };
   feedback: {
     button: string;
@@ -92,24 +103,40 @@ export interface Translation {
 export const zh: Translation = {
   lang: 'zh',
   meta: {
-    title: 'MultiGitGui — 一个软件，同时管理所有仓库',
+    title: 'MultiGitGui — 多仓库 Git 桌面客户端，一个软件管理所有仓库',
     description:
-      '面向一个项目同时包含多个仓库的开发者。支持 Windows、macOS 与 Linux。',
+      'MultiGitGui（也称 MultiGit）是免费的多仓库 Git 桌面客户端。按项目批量 fetch、pull、push、切换分支，支持 Windows、macOS 与 Linux。',
+    keywords: [
+      'MultiGitGui',
+      'MultiGit',
+      'multigitgui',
+      'multigit',
+      'Git GUI',
+      'Git 客户端',
+      'Git 桌面客户端',
+      '多仓库',
+      '多仓库 Git',
+      'Gerrit',
+      'Windows Git',
+    ],
   },
   nav: {
+    about: '简介',
     features: '特性',
     download: '下载',
     faq: '常见问题',
     switchLang: 'EN',
   },
   hero: {
+    name: 'MultiGitGui',
+    aka: '也称 MultiGit · 免费多仓库 Git 桌面客户端',
     badge: 'v3.4.9 · 跨平台 · 免费',
     title1: '一个软件，',
     title2: '同时管理所有仓库',
     subtitle:
       'MultiGitGui 是一款为单项目存在多仓库管理而生的跨平台 Git 桌面客户端。把一项工作涉及的所有仓库编成一个项目，fetch、pull、push、切换分支、reset、stash 全部以项目为单位批量执行，同时尊重每个仓库自己的分支与状态。',
     ctaDownload: '下载 MultiGitGui',
-    ctaFeatures: '了解特性',
+    ctaFeatures: '了解 MultiGitGui',
     platformNote: 'Windows 10+ · macOS 12+ · Linux x64 / arm64',
   },
   mockup: {
@@ -123,6 +150,20 @@ export const zh: Translation = {
     synced: '已同步',
     modified: '有改动',
     conflict: '冲突',
+  },
+  about: {
+    label: '01 · about',
+    title: '什么是 MultiGitGui',
+    lead:
+      'MultiGitGui 是本软件的全名，也可称为 MultiGit。它是一款免费的跨平台 Git 桌面客户端，专门处理「一个项目里有多个 Git 仓库」的日常工作。',
+    body:
+      '把相关仓库编进同一个项目后，fetch、pull、push、切换分支、reset、stash 可以按项目批量执行，每个仓库仍保留自己的分支与状态。MultiGitGui 不内置 Git，沿用你本机已配置的凭证、hooks 与 SSH，支持 Windows、macOS 与 Linux。',
+    facts: [
+      { title: '软件名称', desc: '全称 MultiGitGui，简称 MultiGit。' },
+      { title: '软件类型', desc: '多仓库 Git GUI，也就是 Git 桌面客户端。' },
+      { title: '适用平台', desc: 'Windows、macOS、Linux 原生应用，无需浏览器。' },
+      { title: '使用方式', desc: '完全免费，无订阅、无功能档。' },
+    ],
   },
   features: {
     title: '为单项目包含多代码库设计',
@@ -216,6 +257,10 @@ export const zh: Translation = {
     title: '常见问题',
     items: [
       {
+        q: 'MultiGit 和 MultiGitGui 是什么关系？',
+        a: '同一款软件。全名是 MultiGitGui，也可称为 MultiGit。它是免费的多仓库 Git 桌面客户端，用来在一个项目里同时管理多个 Git 仓库。',
+      },
+      {
         q: '需要自己安装 Git 吗？',
         a: '需要。MultiGitGui 不内置 Git，而是驱动你选定的 Git（2.30 或更新版本），因此你的 credential helper、hooks 与 SSH 配置都继续生效。也可以在设置中直接指定 Git 可执行文件路径。',
       },
@@ -242,9 +287,10 @@ export const zh: Translation = {
     ],
   },
   footer: {
-    tagline: '面向跨仓库工作流的多仓库 Git 桌面客户端。',
+    tagline: 'MultiGitGui（也称 MultiGit）是面向跨仓库工作流的多仓库 Git 桌面客户端。',
     product: '产品',
     platforms: '平台',
+    aboutLink: '简介',
     featuresLink: '特性',
     downloadLink: '下载',
     faqLink: '常见问题',
@@ -252,6 +298,7 @@ export const zh: Translation = {
     mac: 'macOS 12+',
     linux: 'Linux x64 / arm64',
     copyright: '© {year}. 保留所有权利。',
+    botsAllowed: '允许搜索引擎、爬虫与自动化访问，无任何限制',
   },
   feedback: {
     button: '意见反馈',

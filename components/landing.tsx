@@ -5,6 +5,7 @@ import { en } from '@/lib/locales/en';
 import type { Translation } from '@/lib/locales/zh';
 import SiteHeader from '@/components/landing/site-header';
 import Hero from '@/components/landing/hero';
+import About from '@/components/landing/about';
 import Features from '@/components/landing/features';
 import DownloadSection from '@/components/landing/download-section';
 import Faq from '@/components/landing/faq';
@@ -64,6 +65,7 @@ export default function Landing({ lang }: Props) {
       <SiteHeader t={t} lang={lang} />
       <main className="relative z-10 flex-1">
         <Hero t={t} />
+        <About t={t} />
         <Features t={t} />
         <DownloadSection t={t} />
         <Faq t={t} />

@@ -24,6 +24,7 @@ export default function SiteHeader({ t, lang }: Props) {
   }, []);
 
   const nav = [
+    { name: t.nav.about, href: '#about' },
     { name: t.nav.features, href: '#features' },
     { name: t.nav.download, href: '#download' },
     { name: t.nav.faq, href: '#faq' },
@@ -37,7 +38,7 @@ export default function SiteHeader({ t, lang }: Props) {
           isScrolled && 'shadow-[0_20px_50px_-20px_rgba(15,23,42,0.3)]'
         )}
       >
-        <Link href="/" className="flex items-center gap-2.5" aria-label="MultiGitGui">
+        <Link href={lang === 'en' ? '/en' : '/'} className="flex items-center gap-2.5" aria-label="MultiGitGui, also called MultiGit">
           <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white/70 shadow-sm">
             <Image
               src="/logo.png"
@@ -53,12 +54,12 @@ export default function SiteHeader({ t, lang }: Props) {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 md:flex">
+        <nav className="hidden items-center gap-5 lg:gap-7 md:flex">
           {nav.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="font-mono text-xs uppercase tracking-[0.16em] text-slate-500 transition-colors hover:text-slate-900"
+              className="font-mono text-xs uppercase tracking-[0.14em] text-slate-500 transition-colors hover:text-slate-900"
             >
               {item.name}
             </a>
