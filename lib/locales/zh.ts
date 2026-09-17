@@ -130,7 +130,7 @@ export const zh: Translation = {
   hero: {
     name: 'MultiGitGui',
     aka: '也称 MultiGit · 免费多仓库 Git 桌面客户端',
-    badge: 'v3.4.9 · 跨平台 · 免费',
+    badge: 'v3.5.9 · 跨平台 · 免费',
     title1: '一个软件，',
     title2: '同时管理所有仓库',
     subtitle:
@@ -239,7 +239,7 @@ export const zh: Translation = {
     gitReq: '建议 Git 2.30 或更新版本（MultiGitGui 不内置 Git，驱动你选定的 Git，因此 credential helper、hooks 与 SSH 配置继续生效）。',
     windows: {
       name: 'Windows',
-      file: 'MultiGitGui-Setup-3.4.9.exe',
+      file: 'MultiGitGui-Setup-3.5.9.exe',
       desc: '单文件安装向导（NativeAOT 编译，无需 .NET 运行时），支持自定义安装路径、开始菜单与桌面快捷方式。',
     },
     macos: {

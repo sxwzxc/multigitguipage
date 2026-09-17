@@ -2,13 +2,5 @@
   "version": "3.4.9",
   "publishedAt": "2026-09-10",
   "changelogUrl": "/api/changelog/3.4.9.md",
-  "installer": {
-    "version": "3.4.9",
-    "file": "MultiGitGui-Setup-3.4.9.exe",
-    "size": 87578624,
-    "parts": 5,
-    "chunkSize": 20971520,
-    "sha256": "5f63af5e045cb62a6e97ef0f424ad4d434fae674c35757d5a33db3c143a808cb",
-    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-3.4.9.exe"
-  }
+  "installer": null
 }
