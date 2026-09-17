@@ -55,7 +55,7 @@
 1. 从 Release 下载 `CHANGELOG.md`（若 release 不携带则跳过入库，仅重建端点）：
    `node scripts/bump-version.mjs <新文件名> <size> <parts> <sha256> --changelog <CHANGELOG.md> --published-at <ISO时间>`
    脚本会自动完成：
-   - 重写 `lib/installer.ts`（`file`/`size`/`parts`/`chunkSize`/`sha256`/`directUrl` 直链）
+   - 就地更新 `lib/installer.ts` 的 `windowsInstaller` 字段（`file`/`size`/`parts`/`chunkSize`/`sha256`/`directUrl` 直链），保留其它导出，禁止整文件覆盖
    - 替换版本号引用（旧版 → 新版）：`lib/locales/zh.ts`、`lib/locales/en.ts`
      （`hero.badge`、`download.windows.file`）、`components/landing/download-section.tsx`（`v<版本>` 徽章）
    - 把 changelog 以 `## <版本> (<日期>)` 段落入库 `CHANGELOG.md`（同版本替换、否则置顶插入），

@@ -11,7 +11,8 @@
  *     --changelog /tmp/CHANGELOG.md --published-at 2025-06-01T10:00:00Z
  *
  * 行为:
- *   1. 重写 lib/installer.ts（file/size/parts/chunkSize/sha256/directUrl）
+ *   1. 就地更新 lib/installer.ts 的 windowsInstaller 字段
+ *      （file/size/parts/chunkSize/sha256/directUrl），保留其它导出，禁止整文件覆盖
  *   2. 精确替换 lib/locales/zh.ts、lib/locales/en.ts、
  *      components/landing/download-section.tsx 中的旧版本号（文件名 + v<版本>）
  *   3. 传入 --changelog 时：把内容以 "## <版本> (<日期>)" 段落写入仓库根 CHANGELOG.md
@@ -90,25 +91,48 @@ if (!oldMatch) {
 }
 const oldVersion = oldMatch[1];
 
-// 重写 lib/installer.ts
-const installerTemplate = `/**
- * Windows 安装包元数据。
- *
- * 由 scripts/split-installer.mjs 生成，发布新版本时重新运行脚本并同步此文件：
- *   node scripts/split-installer.mjs installer/MultiGitGui-Setup-<version>.exe public/downloads
- *
- * directUrl 为 CDN 直链（主下载通道）；分片（public/downloads/）为备用下载通道。
- */
-export const windowsInstaller = {
-  file: '${fileArg}',
-  size: ${size},
-  parts: ${parts},
-  chunkSize: ${chunkSize},
-  sha256: '${sha256}',
-  directUrl: '${directUrl}',
-} as const;
-`;
-fs.writeFileSync(installerPath, installerTemplate, 'utf8');
+// 就地更新元数据字段，保留 windowsInstaller 以外的导出（禁止整文件覆盖）。
+function patchInstallerFields(src, meta) {
+  const fields = [
+    [
+      'file',
+      /^([ \t]*)file: 'MultiGitGui-Setup-\d+\.\d+\.\d+\.exe'/m,
+      (indent) => `${indent}file: '${meta.file}'`,
+    ],
+    ['size', /^([ \t]*)size: \d+/m, (indent) => `${indent}size: ${meta.size}`],
+    ['parts', /^([ \t]*)parts: \d+/m, (indent) => `${indent}parts: ${meta.parts}`],
+    [
+      'chunkSize',
+      /^([ \t]*)chunkSize: \d+/m,
+      (indent) => `${indent}chunkSize: ${meta.chunkSize}`,
+    ],
+    [
+      'sha256',
+      /^([ \t]*)sha256: '[0-9a-fA-F]+'/m,
+      (indent) => `${indent}sha256: '${meta.sha256}'`,
+    ],
+    [
+      'directUrl',
+      /^([ \t]*)directUrl: 'https:\/\/multigit\.shenxw\.cn\/MultiGitGui-Setup-\d+\.\d+\.\d+\.exe'/m,
+      (indent) => `${indent}directUrl: '${meta.directUrl}'`,
+    ],
+  ];
+  let next = src;
+  for (const [name, re, render] of fields) {
+    if (!next.match(re)) {
+      return { ok: false, missing: name };
+    }
+    next = next.replace(re, (_, indent) => render(indent));
+  }
+  return { ok: true, source: next };
+}
+
+const patched = patchInstallerFields(installerSrc, installerMeta);
+if (!patched.ok) {
+  console.error(`无法就地更新 lib/installer.ts 字段: ${patched.missing}`);
+  process.exit(1);
+}
+fs.writeFileSync(installerPath, patched.source, 'utf8');
 
 // 替换版本号引用（旧文件串与 v<旧版本> 完整匹配，避免子串误伤）
 const targets = [

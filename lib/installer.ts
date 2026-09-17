@@ -1,8 +1,9 @@
 /**
  * Windows 安装包元数据。
  *
- * 由 scripts/split-installer.mjs 生成，发布新版本时重新运行脚本并同步此文件：
- *   node scripts/split-installer.mjs installer/MultiGitGui-Setup-<version>.exe public/downloads
+ * 发布时由 scripts/bump-version.mjs 就地更新 windowsInstaller 字段
+ * （file / size / parts / chunkSize / sha256 / directUrl），不会整文件覆盖，
+ * 因此本文件中的其它导出（如 installerVersion）会被保留。
  *
  * directUrl 为 CDN 直链（主下载通道）；分片（public/downloads/）为备用下载通道。
  */

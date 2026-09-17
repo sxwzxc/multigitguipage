@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { en } from '@/lib/locales/en';
 import { zh, type Lang } from '@/lib/locales/zh';
-import { installerVersion, windowsInstaller } from '@/lib/installer';
+import { windowsInstaller } from '@/lib/installer';
 import {
   LANGUAGE_ALTERNATES,
   OG_IMAGE,
@@ -36,6 +36,11 @@ function ogLocaleOf(lang: Lang) {
 
 function htmlLangOf(lang: Lang) {
   return lang === 'zh' ? 'zh-CN' : 'en';
+}
+
+function softwareVersion(): string {
+  const match = windowsInstaller.file.match(/MultiGitGui-Setup-(.+)\.exe$/i);
+  return match?.[1] ?? windowsInstaller.file;
 }
 
 export function rootMetadata(lang: Lang): Metadata {
@@ -108,7 +113,7 @@ export function landingJsonLd(lang: Lang) {
   const path = pathOf(lang);
   const pageUrl = `${SITE_ORIGIN}${path === '/' ? '/' : path}`;
   const logoUrl = `${SITE_ORIGIN}${OG_IMAGE.url}`;
-  const version = installerVersion();
+  const version = softwareVersion();
 
   return {
     '@context': 'https://schema.org',
