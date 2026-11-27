@@ -1,0 +1,14 @@
+{
+  "version": "3.8.17",
+  "publishedAt": "2026-11-27",
+  "changelogUrl": "/api/changelog/3.8.17.md",
+  "installer": {
+    "version": "3.8.17",
+    "file": "MultiGitGui-Setup-3.8.17.exe",
+    "size": 88784384,
+    "parts": 5,
+    "chunkSize": 20971520,
+    "sha256": "7a3ef94a07e5ce051402bd2394d37a4a9bf8aa46894e69a278fc3f78bc50d45f",
+    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-3.8.17.exe"
+  }
+}
