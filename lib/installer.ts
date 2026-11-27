@@ -8,12 +8,12 @@
  * directUrl 为 CDN 直链（主下载通道）；分片（public/downloads/）为备用下载通道。
  */
 export const windowsInstaller = {
-  file: 'MultiGitGui-Setup-3.7.5.exe',
-  size: 88293888,
+  file: 'MultiGitGui-Setup-3.8.16.exe',
+  size: 88783872,
   parts: 5,
   chunkSize: 20971520,
-  sha256: 'c20a424a355c06990b049ccfbaf1a8cb02ee2f25e07692bb9dcc18c4e00e98f9',
-  directUrl: 'https://multigit.shenxw.cn/MultiGitGui-Setup-3.7.5.exe',
+  sha256: '6d6533809a9c3f6181a83c98f6dbd9c6ea82a522b12357fb1d26454d8c13ad3a',
+  directUrl: 'https://multigit.shenxw.cn/MultiGitGui-Setup-3.8.16.exe',
 } as const;
 
 export function installerVersion(): string {

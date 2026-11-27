@@ -2,13 +2,5 @@
   "version": "3.7.5",
   "publishedAt": "2026-10-10",
   "changelogUrl": "/api/changelog/3.7.5.md",
-  "installer": {
-    "version": "3.7.5",
-    "file": "MultiGitGui-Setup-3.7.5.exe",
-    "size": 88293888,
-    "parts": 5,
-    "chunkSize": 20971520,
-    "sha256": "c20a424a355c06990b049ccfbaf1a8cb02ee2f25e07692bb9dcc18c4e00e98f9",
-    "directUrl": "https://multigit.shenxw.cn/MultiGitGui-Setup-3.7.5.exe"
-  }
+  "installer": null
 }
